@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const prisma = require("../../lib/prisma");
+const prisma = require("../../../lib/prisma");
 
 const GetUserDetails = asyncHandler(async (req, res) => {
   const { email } = req.params;

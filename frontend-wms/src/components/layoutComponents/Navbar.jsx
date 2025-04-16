@@ -195,14 +195,8 @@ const Navbar = () => {
       {!currentUser && (
         <div className="flex items-center space-x-2">
           <div
-            onClick={() => handleRegisterToggle()}
-            className="px-5 py-1.5 cursor-pointer text-white rounded-md text-sm flex justify-center items-center bg-blue-500"
-          >
-            <p>Register</p>
-          </div>
-          <div
             onClick={() => handleLoginToggle()}
-            className="px-5 cursor-pointer text-white py-1.5 rounded-md text-sm flex justify-center items-center hover:bg-gray-700 bg-gray-900"
+            className="px-5 cursor-pointer text-white py-1.5 rounded-md text-sm flex justify-center items-center hover:bg-gray-700 bg-gray-800"
           >
             <p>Login</p>
           </div>

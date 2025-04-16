@@ -8,17 +8,20 @@ const corsOptions = {
   credentials: true,
 };
 
-const AuthRoutes = require("./routes/authRoutes/authRoutes");
-const UserRoutes = require("./routes/userRoutes/userRoutes");
+const UsersAuthRoutes = require("./routes/users_auth_Routes/authRoutes");
+const OtherUserRoutes = require("./routes/users_other_Routes/userRoutes");
+const Admin_Routes = require("./routes/admin_Routes/admin_auth_routes");
+const Admin_Crud_Routes = require("./routes/admin_Routes/admin_crud_routes");
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(cors(corsOptions));
 
-// Routes
-app.use(`${process.env.SITE_ADDRESS || "/api"}/auth`, AuthRoutes);
-app.use(`${process.env.SITE_ADDRESS || "/api"}/user`, UserRoutes);
+app.use(`${process.env.SITE_ADDRESS || "/api"}/auth`, UsersAuthRoutes);
+app.use(`${process.env.SITE_ADDRESS || "/api"}/user`, OtherUserRoutes);
+app.use(`${process.env.SITE_ADDRESS || "/api"}/admin`, Admin_Routes);
+app.use(`${process.env.SITE_ADDRESS || "/api"}/admin/fetch`, Admin_Crud_Routes);
 
 const port = 8000 || process.env.port;
 const StartConnection = async () => {

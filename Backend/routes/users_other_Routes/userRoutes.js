@@ -1,7 +1,7 @@
 const express = require("express");
 const {
   GetUserDetails,
-} = require("../../controllers/userControllers/UserCRUD");
+} = require("../../controllers/users/users_other_controllers/UserCRUD");
 const router = express.Router();
 
 // USER DETAILS FETCHING

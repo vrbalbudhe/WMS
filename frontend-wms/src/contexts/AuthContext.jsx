@@ -12,7 +12,6 @@ export const AuthContextProvider = ({ children }) => {
     await fetchUser();
   };
 
-  // Function to fetch user info
   const fetchUser = async () => {
     try {
       const response = await axios.get(
@@ -24,23 +23,29 @@ export const AuthContextProvider = ({ children }) => {
 
       const userInfo = response?.data?.payload;
       if (userInfo) {
-        const response1 = await axios.get(
-          `http://localhost:8000/api/user/${userInfo?.email}`
-        );
-        setCurrentUser(response1?.data?.userInfo || null);
+        if (userInfo.role !== "ADMIN") {
+          const response1 = await axios.get(
+            `http://localhost:8000/api/user/${userInfo?.email}`
+          );
+          setCurrentUser(response1?.data?.userInfo);
+        } else {
+          const response2 = await axios.get(
+            `http://localhost:8000/api/admin/fetch/${userInfo?.email}`
+          );
+          setCurrentUser(response2?.data?.userInfo);
+        }
       } else {
         setCurrentUser(null);
       }
     } catch (error) {
       setCurrentUser(null);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchUser();
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
   }, []);
 
   if (loading) {

@@ -14,20 +14,27 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  email     String   @unique
-  phone     String?  @unique
-  name      String
-  password  String
-  avatar    String?
-  otp       String? // for the forgot password
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userType  UserType
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  email              String   @unique
+  name               String
+  password           String
+  phone              String?  @unique
+  avatar             String?
+  otp                String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  userType           UserType
+  mustChangePassword Boolean  @default(true)
 }
 
 enum UserType {
   procurement_officer
   warehouse_manager
-  admin
+}
+
+model Admin {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
 }

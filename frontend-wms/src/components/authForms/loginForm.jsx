@@ -14,7 +14,7 @@ const LoginForm = ({ setIsLogin }) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/auth/login",
+        "http://localhost:8000/api/admin/login",
         { email, password },
         { withCredentials: true }
       );

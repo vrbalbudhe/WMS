@@ -2,7 +2,6 @@ const expressAsyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
 
 const VerifyTokenMW = expressAsyncHandler(async (req, res) => {
-  const token = req.cookies.token;
   if (!token) {
     return res.status(401).json({
       message: "User is Not Authenticated",

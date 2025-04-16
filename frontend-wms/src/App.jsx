@@ -5,6 +5,7 @@ import Homepage from "./pages/Homepage";
 import React from "react";
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
+import Dashboard from "./pages/admin/Dashboard";
 
 function App() {
   const router = createBrowserRouter([
@@ -19,6 +20,10 @@ function App() {
         {
           path: "/auth",
           element: <AuthPage />,
+        },
+        {
+          path: "/admin/dashboard",
+          element: <Dashboard />,
         },
       ],
     },
