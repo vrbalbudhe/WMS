@@ -78,7 +78,7 @@ const ShipmentDetailsModal = ({ shipment, onClose, onUpdateStatus }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="bg-purple-600 text-white px-6 py-4 flex justify-between items-center">
+        <div className="bg-blue-600 text-white px-6 py-4 flex justify-between items-center">
           <div className="flex items-center">
             {shipment.type === 'Inbound' ? (
               <FaBoxOpen className="mr-2" size={20} />
@@ -145,7 +145,7 @@ const ShipmentDetailsModal = ({ shipment, onClose, onUpdateStatus }) => {
             <button
               className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
                 activeTab === 'details'
-                  ? 'border-purple-500 text-purple-600'
+                  ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
               onClick={() => setActiveTab('details')}
@@ -155,7 +155,7 @@ const ShipmentDetailsModal = ({ shipment, onClose, onUpdateStatus }) => {
             <button
               className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
                 activeTab === 'items'
-                  ? 'border-purple-500 text-purple-600'
+                  ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
               onClick={() => setActiveTab('items')}
@@ -165,7 +165,7 @@ const ShipmentDetailsModal = ({ shipment, onClose, onUpdateStatus }) => {
             <button
               className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
                 activeTab === 'history'
-                  ? 'border-purple-500 text-purple-600'
+                  ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
               onClick={() => setActiveTab('history')}
@@ -184,7 +184,7 @@ const ShipmentDetailsModal = ({ shipment, onClose, onUpdateStatus }) => {
               <div>
                 <div className="mb-6">
                   <div className="flex items-center mb-2">
-                    <FaMapMarkerAlt className="text-purple-600 mr-2" />
+                    <FaMapMarkerAlt className="text-blue-600 mr-2" />
                     <h3 className="text-lg font-medium text-gray-900">Shipment Information</h3>
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4">
@@ -215,7 +215,7 @@ const ShipmentDetailsModal = ({ shipment, onClose, onUpdateStatus }) => {
                 
                 <div className="mb-6">
                   <div className="flex items-center mb-2">
-                    <FaTruck className="text-purple-600 mr-2" />
+                    <FaTruck className="text-blue-600 mr-2" />
                     <h3 className="text-lg font-medium text-gray-900">Carrier Information</h3>
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4">
@@ -240,7 +240,7 @@ const ShipmentDetailsModal = ({ shipment, onClose, onUpdateStatus }) => {
               <div>
                 <div className="mb-6">
                   <div className="flex items-center mb-2">
-                    <FaCalendarAlt className="text-purple-600 mr-2" />
+                    <FaCalendarAlt className="text-blue-600 mr-2" />
                     <h3 className="text-lg font-medium text-gray-900">Dates</h3>
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4">
@@ -265,7 +265,7 @@ const ShipmentDetailsModal = ({ shipment, onClose, onUpdateStatus }) => {
                 
                 <div className="mb-6">
                   <div className="flex items-center mb-2">
-                    <FaUser className="text-purple-600 mr-2" />
+                    <FaUser className="text-blue-600 mr-2" />
                     <h3 className="text-lg font-medium text-gray-900">Customer Information</h3>
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4">
@@ -280,7 +280,7 @@ const ShipmentDetailsModal = ({ shipment, onClose, onUpdateStatus }) => {
                 
                 <div className="mb-6">
                   <div className="flex items-center mb-2">
-                    <FaNotesMedical className="text-purple-600 mr-2" />
+                    <FaNotesMedical className="text-blue-600 mr-2" />
                     <h3 className="text-lg font-medium text-gray-900">Notes</h3>
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4">
@@ -371,16 +371,16 @@ const ShipmentDetailsModal = ({ shipment, onClose, onUpdateStatus }) => {
         {/* Footer */}
         <div className="bg-gray-50 px-6 py-4 flex justify-between">
           <div>
-            <button className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 mr-3">
+            <button className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-3">
               <FaPrint className="mr-2" /> Print
             </button>
-            <button className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+            <button className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
               <FaDownload className="mr-2" /> Export
             </button>
           </div>
           <button
             onClick={onClose}
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             Close
           </button>

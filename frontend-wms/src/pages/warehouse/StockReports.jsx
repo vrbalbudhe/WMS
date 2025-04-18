@@ -160,7 +160,7 @@ const StockReports = () => {
             </button>
             <button 
               onClick={() => handleExportReport('Stock Summary')}
-              className="flex items-center text-white bg-purple-600 hover:bg-purple-700 py-2 px-4 rounded-lg"
+              className="flex items-center text-white bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-lg"
             >
               <FaFileExport className="mr-2" />
               Export Report
@@ -186,7 +186,7 @@ const StockReports = () => {
             title="Total Items"
             value={stockSummary.totalItems}
             icon={<FaBox />}
-            color="bg-purple-100 text-purple-800"
+            color="bg-blue-100 text-blue-800"
           />
           <StockSummaryCard 
             title="Total Value"
@@ -226,12 +226,12 @@ const StockReports = () => {
           <div className="bg-white rounded-lg shadow">
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <h2 className="text-lg font-semibold text-gray-700 flex items-center">
-                <FaChartLine className="mr-2 text-purple-600" />
+                <FaChartLine className="mr-2 text-blue-600" />
                 Stock Level Trends
               </h2>
               <button
                 onClick={() => handleExportReport('Stock Trends')}
-                className="text-sm text-purple-600 hover:underline"
+                className="text-sm text-blue-600 hover:underline"
               >
                 <FaDownload className="inline mr-1" /> Export
               </button>
@@ -245,12 +245,12 @@ const StockReports = () => {
           <div className="bg-white rounded-lg shadow">
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <h2 className="text-lg font-semibold text-gray-700 flex items-center">
-                <FaChartPie className="mr-2 text-purple-600" />
+                <FaChartPie className="mr-2 text-blue-600" />
                 Category Distribution
               </h2>
               <button
                 onClick={() => handleExportReport('Category Distribution')}
-                className="text-sm text-purple-600 hover:underline"
+                className="text-sm text-blue-600 hover:underline"
               >
                 <FaDownload className="inline mr-1" /> Export
               </button>
@@ -265,12 +265,12 @@ const StockReports = () => {
         <div className="bg-white rounded-lg shadow">
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-700 flex items-center">
-              <FaChartBar className="mr-2 text-purple-600" />
+              <FaChartBar className="mr-2 text-blue-600" />
               Stock Levels by Category
             </h2>
             <button
               onClick={() => handleExportReport('Stock Levels by Category')}
-              className="text-sm text-purple-600 hover:underline"
+              className="text-sm text-blue-600 hover:underline"
             >
               <FaDownload className="inline mr-1" /> Export
             </button>
@@ -289,7 +289,7 @@ const StockReports = () => {
             </h2>
             <button
               onClick={() => handleExportReport('Low Stock Items')}
-              className="text-sm text-purple-600 hover:underline"
+              className="text-sm text-blue-600 hover:underline"
             >
               <FaDownload className="inline mr-1" /> Export
             </button>
