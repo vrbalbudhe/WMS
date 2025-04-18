@@ -31,7 +31,7 @@ const StockReportFilters = ({
         {/* Date Range Filter */}
         <div>
           <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
-            <FaCalendarAlt className="mr-2 text-purple-600" />
+            <FaCalendarAlt className="mr-2 text-blue-600" />
             Date Range
           </h3>
           <div className="grid grid-cols-2 gap-4">
@@ -45,7 +45,7 @@ const StockReportFilters = ({
                 name="startDate"
                 value={dateRange.startDate}
                 onChange={handleDateChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <div>
@@ -59,7 +59,7 @@ const StockReportFilters = ({
                 value={dateRange.endDate}
                 onChange={handleDateChange}
                 min={dateRange.startDate}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
           </div>
@@ -120,14 +120,14 @@ const StockReportFilters = ({
         {/* Category Filter */}
         <div>
           <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
-            <FaChartPie className="mr-2 text-purple-600" />
+            <FaChartPie className="mr-2 text-blue-600" />
             Category Filter
           </h3>
           <div className="grid grid-cols-2 gap-4">
             <select
               value={categoryFilter}
               onChange={(e) => onCategoryChange(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             >
               {categories.map(category => (
                 <option key={category} value={category}>
@@ -144,7 +144,7 @@ const StockReportFilters = ({
                 key={category}
                 className={`text-xs ${
                   categoryFilter === category 
-                    ? 'bg-purple-100 text-purple-800' 
+                    ? 'bg-blue-100 text-blue-800' 
                     : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                 } px-2 py-1 rounded`}
                 onClick={() => onCategoryChange(category)}
@@ -159,7 +159,7 @@ const StockReportFilters = ({
       {/* Apply Button */}
       <div className="mt-6 flex justify-end">
         <button
-          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
           onClick={onClose}
         >
           Apply Filters

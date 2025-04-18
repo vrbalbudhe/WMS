@@ -48,7 +48,7 @@ const InventoryFilters = ({ filters, setFilters, categories, statuses, suppliers
                 id={`category-${category}`}
                 checked={filters.category.includes(category)}
                 onChange={() => toggleFilter('category', category)}
-                className="h-4 w-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
+                className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
               />
               <label htmlFor={`category-${category}`} className="ml-2 text-sm text-gray-700">
                 {category}
@@ -69,7 +69,7 @@ const InventoryFilters = ({ filters, setFilters, categories, statuses, suppliers
                 id={`status-${status}`}
                 checked={filters.status.includes(status)}
                 onChange={() => toggleFilter('status', status)}
-                className="h-4 w-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
+                className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
               />
               <label htmlFor={`status-${status}`} className="ml-2 text-sm text-gray-700">
                 {status}
@@ -90,7 +90,7 @@ const InventoryFilters = ({ filters, setFilters, categories, statuses, suppliers
                 id={`supplier-${supplier}`}
                 checked={filters.supplier.includes(supplier)}
                 onChange={() => toggleFilter('supplier', supplier)}
-                className="h-4 w-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
+                className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
               />
               <label htmlFor={`supplier-${supplier}`} className="ml-2 text-sm text-gray-700">
                 {supplier}
