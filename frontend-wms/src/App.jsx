@@ -5,11 +5,28 @@ import Homepage from "./pages/Homepage";
 import React from "react";
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
-import Dashboard from "./pages/admin/Dashboard";
+
+// Admin
 import { AdminLayout } from "./layouts/AdminLayout";
+import Dashboard from "./pages/admin/Dashboard";
 import UserRegistration from "./pages/admin/UserRegistration";
 import ProcurementOffInfo from "./pages/admin/ProcurementOfficerInfo";
 import WarehouseOfficerInfo from "./pages/admin/WarehouseOfficerInfo";
+
+// WareHouse Officer
+import { WarehouseLayout } from "./layouts/WarehouseLayout";
+import WarehouseDashboard from "./pages/warehouse/WarehouseDashboard";
+import InventoryManagement from "./pages/warehouse/InventoryManagement";
+import ShipmentTracking from "./pages/warehouse/ShipmentTracking";
+import StockReports from "./pages/warehouse/StockReports";
+
+// Procurement Officer
+import { ProcurementLayout } from "./layouts/ProcurementLayout";
+import ProcurementDashboard from "./pages/procurement/ProcurementDashboard";
+import PurchaseRequests from "./pages/procurement/PurchaseRequests";
+import VendorManagement from "./pages/procurement/VendorManagement";
+import PurchaseOrders from "./pages/procurement/PurchaseOrders";
+import ProcurementReports from "./pages/procurement/ProcurementReports";
 
 function App() {
   const router = createBrowserRouter([
@@ -56,6 +73,56 @@ function App() {
         {
           path: "warehouse-officers",
           element: <WarehouseOfficerInfo />,
+        },
+      ],
+    },
+    // New routes for warehouse manager
+    {
+      path: "/warehouse",
+      element: <WarehouseLayout />,
+      children: [
+        {
+          path: "dashboard",
+          element: <WarehouseDashboard />,
+        },
+        {
+          path: "inventory",
+          element: <InventoryManagement />,
+        },
+        {
+          path: "shipments",
+          element: <ShipmentTracking />,
+        },
+        {
+          path: "reports",
+          element: <StockReports />,
+        },
+      ],
+    },
+    // New routes for procurement officer
+    {
+      path: "/procurement",
+      element: <ProcurementLayout />,
+      children: [
+        {
+          path: "dashboard",
+          element: <ProcurementDashboard />,
+        },
+        {
+          path: "purchase-requests",
+          element: <PurchaseRequests />,
+        },
+        {
+          path: "vendors",
+          element: <VendorManagement />,
+        },
+        {
+          path: "orders",
+          element: <PurchaseOrders />,
+        },
+        {
+          path: "reports",
+          element: <ProcurementReports />,
         },
       ],
     },
