@@ -6,6 +6,10 @@ import React from "react";
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
 import Dashboard from "./pages/admin/Dashboard";
+import { AdminLayout } from "./layouts/AdminLayout";
+import UserRegistration from "./pages/admin/UserRegistration";
+import ProcurementOffInfo from "./pages/admin/ProcurementOfficerInfo";
+import WarehouseOfficerInfo from "./pages/admin/WarehouseOfficerInfo";
 
 function App() {
   const router = createBrowserRouter([
@@ -21,19 +25,37 @@ function App() {
           path: "/auth",
           element: <AuthPage />,
         },
+      ],
+    },
+    {
+      path: "/user",
+      element: <ProtectedLayout />,
+      children: [
         {
-          path: "/admin/dashboard",
-          element: <Dashboard />,
+          path: ":id",
+          element: <ProfilePage />,
         },
       ],
     },
     {
-      path: "/",
-      element: <ProtectedLayout />,
+      path: "/admin",
+      element: <AdminLayout />,
       children: [
         {
-          path: "/user/:id",
-          element: <ProfilePage />,
+          path: "dashboard",
+          element: <Dashboard />,
+        },
+        {
+          path: "create-users",
+          element: <UserRegistration />,
+        },
+        {
+          path: "procurement-officers",
+          element: <ProcurementOffInfo />,
+        },
+        {
+          path: "warehouse-officers",
+          element: <WarehouseOfficerInfo />,
         },
       ],
     },

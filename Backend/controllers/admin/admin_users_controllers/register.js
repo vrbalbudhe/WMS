@@ -6,6 +6,7 @@ const OtherUsersRegister = asyncHandler(async (req, res) => {
     const { name, userType, email, password, phone } = req.body;
 
     try {
+        
         if (!email || !password || !name || !userType || !phone) {
             return res.status(400).json({
                 success: false,

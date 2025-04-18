@@ -3,11 +3,11 @@ const prisma = require("../../../lib/prisma");
 
 
 /*
- *@usage - GET ADMIN DETAILS
+ *@usage - DELETE USERS (PROCUREMENT OFFICERS || WAREHOUSE MANAGER)
  *@PARAMS - EMAIL
- *@RETURN - ADMIN DETAILS OBJECTS
+ *@RETURN - DELETES THE USERS
  */
-const GetAdminDetails = asyncHandler(async (req, res) => {
+const DeleteUser = asyncHandler(async (req, res) => {
     const { email } = req.params;
     try {
         if (!email) {
@@ -17,19 +17,21 @@ const GetAdminDetails = asyncHandler(async (req, res) => {
             });
         }
 
-        const user = await prisma.admin.findUnique({
+        const existingUser = await prisma.user.findUnique({
             where: { email },
         });
-        if (!user) {
+        if (!existingUser) {
             return res.status(401).json({
-                message: "Admin Does Not Exist",
+                message: "User Does Not Exist",
                 success: false,
             });
         }
+        await prisma.user.delete({
+            where: { email: existingUser.email }
+        })
         return res.status(200).json({
-            message: "Admin Details Fetched Successfully!",
+            message: "User Deleted Successfully!",
             success: true,
-            userInfo: user,
         });
     } catch (error) {
         res.status(501).json({
@@ -39,4 +41,4 @@ const GetAdminDetails = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { GetAdminDetails };
+module.exports = { DeleteUser };
