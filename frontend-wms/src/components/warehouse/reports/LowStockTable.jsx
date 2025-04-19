@@ -98,7 +98,7 @@ const LowStockTable = ({ items }) => {
               </div>
             </td>
             <td className="px-3 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <button className="text-purple-600 hover:text-purple-900">
+              <button className="text-blue-600 hover:text-blue-900">
                 <FaShoppingCart size={16} />
               </button>
             </td>

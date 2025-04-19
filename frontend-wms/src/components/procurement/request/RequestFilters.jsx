@@ -1,7 +1,14 @@
 import React from 'react';
 import { FaTimes } from 'react-icons/fa';
 
-const ShipmentFilters = ({ filters, setFilters, statuses, types, carriers, onClose }) => {
+const RequestFilters = ({ 
+  filters, 
+  setFilters, 
+  statuses, 
+  departments, 
+  priorities, 
+  onClose 
+}) => {
   // Toggle a filter value (add/remove)
   const toggleFilter = (type, value) => {
     if (filters[type].includes(value)) {
@@ -21,23 +28,36 @@ const ShipmentFilters = ({ filters, setFilters, statuses, types, carriers, onClo
   const resetFilters = () => {
     setFilters({
       status: [],
-      type: [],
-      carrier: []
+      department: [],
+      priority: []
     });
   };
-  
-  // Get the color class for status badges
+
+  // Function to get status badge style
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Delivered':
-      case 'Received':
+      case 'Approved':
+      case 'Completed':
         return 'bg-green-100 text-green-800';
-      case 'In Transit':
-        return 'bg-yellow-100 text-yellow-800';
+      case 'Pending Approval':
       case 'Processing':
-        return 'bg-blue-100 text-blue-800';
-      case 'Delayed':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'Rejected':
         return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+  
+  // Function to get priority badge style
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case 'High':
+        return 'bg-red-100 text-red-800';
+      case 'Medium':
+        return 'bg-orange-100 text-orange-800';
+      case 'Low':
+        return 'bg-blue-100 text-blue-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -65,7 +85,7 @@ const ShipmentFilters = ({ filters, setFilters, statuses, types, carriers, onClo
                 id={`status-${status}`}
                 checked={filters.status.includes(status)}
                 onChange={() => toggleFilter('status', status)}
-                className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                className="h-4 w-4 text-green-600 rounded border-gray-300 focus:ring-green-500"
               />
               <label htmlFor={`status-${status}`} className="ml-2 text-sm text-gray-700 flex items-center">
                 <span className={`inline-block w-2 h-2 rounded-full mr-2 ${getStatusColor(status)}`}></span>
@@ -76,42 +96,43 @@ const ShipmentFilters = ({ filters, setFilters, statuses, types, carriers, onClo
         </div>
       </div>
       
-      {/* Type Filters */}
+      {/* Department Filters */}
       <div className="mb-4">
-        <h3 className="font-medium text-gray-700 mb-2">Type</h3>
+        <h3 className="font-medium text-gray-700 mb-2">Department</h3>
         <div className="space-y-2">
-          {types.map(type => (
-            <div key={type} className="flex items-center">
+          {departments.map(department => (
+            <div key={department} className="flex items-center">
               <input
                 type="checkbox"
-                id={`type-${type}`}
-                checked={filters.type.includes(type)}
-                onChange={() => toggleFilter('type', type)}
-                className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                id={`dept-${department}`}
+                checked={filters.department.includes(department)}
+                onChange={() => toggleFilter('department', department)}
+                className="h-4 w-4 text-green-600 rounded border-gray-300 focus:ring-green-500"
               />
-              <label htmlFor={`type-${type}`} className="ml-2 text-sm text-gray-700">
-                {type}
+              <label htmlFor={`dept-${department}`} className="ml-2 text-sm text-gray-700">
+                {department}
               </label>
             </div>
           ))}
         </div>
       </div>
       
-      {/* Carrier Filters */}
+      {/* Priority Filters */}
       <div className="mb-4">
-        <h3 className="font-medium text-gray-700 mb-2">Carrier</h3>
+        <h3 className="font-medium text-gray-700 mb-2">Priority</h3>
         <div className="space-y-2">
-          {carriers.map(carrier => (
-            <div key={carrier} className="flex items-center">
+          {priorities.map(priority => (
+            <div key={priority} className="flex items-center">
               <input
                 type="checkbox"
-                id={`carrier-${carrier}`}
-                checked={filters.carrier.includes(carrier)}
-                onChange={() => toggleFilter('carrier', carrier)}
-                className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                id={`priority-${priority}`}
+                checked={filters.priority.includes(priority)}
+                onChange={() => toggleFilter('priority', priority)}
+                className="h-4 w-4 text-green-600 rounded border-gray-300 focus:ring-green-500"
               />
-              <label htmlFor={`carrier-${carrier}`} className="ml-2 text-sm text-gray-700">
-                {carrier}
+              <label htmlFor={`priority-${priority}`} className="ml-2 text-sm text-gray-700 flex items-center">
+                <span className={`inline-block w-2 h-2 rounded-full mr-2 ${getPriorityColor(priority)}`}></span>
+                {priority}
               </label>
             </div>
           ))}
@@ -129,4 +150,4 @@ const ShipmentFilters = ({ filters, setFilters, statuses, types, carriers, onClo
   );
 };
 
-export default ShipmentFilters;
+export default RequestFilters;

@@ -28,7 +28,7 @@ const ItemDetailsModal = ({ item, onClose, onEdit }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="bg-purple-600 text-white px-6 py-4 flex justify-between items-center">
+        <div className="bg-blue-600 text-white px-6 py-4 flex justify-between items-center">
           <h2 className="text-xl font-semibold">Item Details</h2>
           <button onClick={onClose} className="text-white hover:text-gray-200">
             <FaTimes size={20} />
@@ -74,7 +74,7 @@ const ItemDetailsModal = ({ item, onClose, onEdit }) => {
             <div>
               <div className="mb-6">
                 <div className="text-sm text-gray-500 mb-1">Current Quantity</div>
-                <div className="text-2xl font-bold text-purple-600">{item.quantity}</div>
+                <div className="text-2xl font-bold text-blue-600">{item.quantity}</div>
               </div>
               
               <div className="mb-6">
@@ -97,7 +97,7 @@ const ItemDetailsModal = ({ item, onClose, onEdit }) => {
           {/* Inventory History */}
           <div className="mt-8">
             <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-              <FaHistory className="mr-2 text-purple-600" />
+              <FaHistory className="mr-2 text-blue-600" />
               Inventory History
             </h3>
             
@@ -145,7 +145,7 @@ const ItemDetailsModal = ({ item, onClose, onEdit }) => {
           
           {/* Quick actions */}
           <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <button className="flex items-center justify-center p-3 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200">
+            <button className="flex items-center justify-center p-3 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200">
               <FaEdit className="mr-2" />
               Update Quantity
             </button>
@@ -164,13 +164,13 @@ const ItemDetailsModal = ({ item, onClose, onEdit }) => {
         <div className="bg-gray-50 px-6 py-4 flex justify-end">
           <button
             onClick={onEdit}
-            className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             <FaEdit className="mr-2" /> Edit Item
           </button>
           <button
             onClick={onClose}
-            className="ml-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            className="ml-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             Close
           </button>

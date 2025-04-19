@@ -14,7 +14,7 @@ const ShipmentTable = ({
     if (sortField !== field) {
       return <FaSort className="text-gray-400" />;
     }
-    return sortDirection === 'asc' ? <FaSortUp className="text-purple-600" /> : <FaSortDown className="text-purple-600" />;
+    return sortDirection === 'asc' ? <FaSortUp className="text-blue-600" /> : <FaSortDown className="text-blue-600" />;
   };
   
   // Function to get status badge style
@@ -179,7 +179,7 @@ const ShipmentTable = ({
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                     {shipment.type === 'Inbound' ? (
                       <span className="flex items-center">
-                        <FaBoxOpen className="text-purple-600 mr-1" size={14} />
+                        <FaBoxOpen className="text-blue-600 mr-1" size={14} />
                         {shipment.type}
                       </span>
                     ) : (
@@ -201,7 +201,7 @@ const ShipmentTable = ({
                   <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button 
                       onClick={() => onView(shipment)} 
-                      className="text-purple-600 hover:text-purple-900"
+                      className="text-blue-600 hover:text-blue-900"
                       title="View details"
                     >
                       <FaEye size={16} />

@@ -117,7 +117,7 @@ const CreateShipmentModal = ({ carriers, onSave, onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="bg-purple-600 text-white px-6 py-4 flex justify-between items-center">
+        <div className="bg-blue-600 text-white px-6 py-4 flex justify-between items-center">
           <h2 className="text-xl font-semibold">Create New Shipment</h2>
           <button onClick={onClose} className="text-white hover:text-gray-200">
             <FaTimes size={20} />
@@ -141,7 +141,7 @@ const CreateShipmentModal = ({ carriers, onSave, onClose }) => {
                   value={formData.type}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="Outbound">Outbound</option>
                   <option value="Inbound">Inbound</option>
@@ -158,7 +158,7 @@ const CreateShipmentModal = ({ carriers, onSave, onClose }) => {
                   value={formData.origin}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">Select Origin</option>
                   {formData.type === 'Outbound' 
@@ -182,7 +182,7 @@ const CreateShipmentModal = ({ carriers, onSave, onClose }) => {
                   value={formData.destination}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">Select Destination</option>
                   {formData.type === 'Outbound' 
@@ -207,7 +207,7 @@ const CreateShipmentModal = ({ carriers, onSave, onClose }) => {
                   value={formData.customer}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Retail Division"
                 />
               </div>
@@ -222,7 +222,7 @@ const CreateShipmentModal = ({ carriers, onSave, onClose }) => {
                   value={formData.notes}
                   onChange={handleChange}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Any special instructions or notes"
                 />
               </div>
@@ -243,7 +243,7 @@ const CreateShipmentModal = ({ carriers, onSave, onClose }) => {
                   value={formData.date}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               
@@ -259,7 +259,7 @@ const CreateShipmentModal = ({ carriers, onSave, onClose }) => {
                   onChange={handleChange}
                   required
                   min={formData.date}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               
@@ -273,7 +273,7 @@ const CreateShipmentModal = ({ carriers, onSave, onClose }) => {
                   value={formData.carrier}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">Select Carrier</option>
                   {carriersList.map(carrier => (
@@ -293,7 +293,7 @@ const CreateShipmentModal = ({ carriers, onSave, onClose }) => {
                   name="trackingNumber"
                   value={formData.trackingNumber}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   placeholder="e.g., FE-123456789"
                 />
               </div>
@@ -316,7 +316,7 @@ const CreateShipmentModal = ({ carriers, onSave, onClose }) => {
                     name="name"
                     value={currentItem.name}
                     onChange={handleItemChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     placeholder="e.g., Office Chair"
                   />
                 </div>
@@ -329,7 +329,7 @@ const CreateShipmentModal = ({ carriers, onSave, onClose }) => {
                     name="sku"
                     value={currentItem.sku}
                     onChange={handleItemChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     placeholder="e.g., SKU-12345"
                   />
                 </div>
@@ -343,14 +343,14 @@ const CreateShipmentModal = ({ carriers, onSave, onClose }) => {
                     value={currentItem.quantity}
                     onChange={handleItemChange}
                     min="1"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 <div className="flex items-end">
                   <button
                     type="button"
                     onClick={handleAddItem}
-                    className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                    className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   >
                     <FaPlus className="mr-2" /> Add Item
                   </button>
@@ -417,14 +417,14 @@ const CreateShipmentModal = ({ carriers, onSave, onClose }) => {
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 mr-3"
+            className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-3"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={handleSubmit}
-            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             disabled={formData.items.length === 0}
           >
             <FaSave className="mr-2" /> Create Shipment

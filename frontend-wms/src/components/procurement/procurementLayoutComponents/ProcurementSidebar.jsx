@@ -23,7 +23,7 @@ const ProcurementSidebar = ({ isOpen, toggleSidebar }) => {
     <div className="relative">
       <button
         onClick={toggleSidebar}
-        className="fixed z-30 top-4 left-4 p-3 rounded-full bg-green-600 text-white shadow-md hover:bg-green-700 transition-colors duration-200 lg:hidden"
+        className="fixed z-30 top-4 left-4 p-3 rounded-full bg-blue-600 text-white shadow-md hover:bg-blue-700 transition-colors duration-200 lg:hidden"
       >
         {isOpen ? <FaTimes /> : <FaBars />}
       </button>
@@ -41,7 +41,7 @@ const ProcurementSidebar = ({ isOpen, toggleSidebar }) => {
             : "-translate-x-full w-0 lg:w-64 lg:translate-x-0"
         }`}
       >
-        <div className="h-16 bg-green-600 flex items-center px-6">
+        <div className="h-16 bg-blue-600 flex items-center px-6">
           <h1 className="text-white text-lg font-medium">Procurement Panel</h1>
         </div>
         <nav className="py-4">
@@ -49,7 +49,7 @@ const ProcurementSidebar = ({ isOpen, toggleSidebar }) => {
             <li
               className={`flex items-center space-x-3 py-3 px-4 rounded-lg cursor-pointer transition-colors duration-200 ${
                 activeItem === "dashboard"
-                  ? "bg-green-50 text-green-600"
+                  ? "bg-blue-50 text-blue-600"
                   : "text-gray-700 hover:bg-gray-100"
               }`}
             >
@@ -61,7 +61,7 @@ const ProcurementSidebar = ({ isOpen, toggleSidebar }) => {
                 <FaChartBar
                   className={
                     activeItem === "dashboard"
-                      ? "text-green-600"
+                      ? "text-blue-600"
                       : "text-gray-500"
                   }
                 />
@@ -72,7 +72,7 @@ const ProcurementSidebar = ({ isOpen, toggleSidebar }) => {
             <li
               className={`flex items-center space-x-3 py-3 px-4 rounded-lg cursor-pointer transition-colors duration-200 ${
                 activeItem === "purchase-requests"
-                  ? "bg-green-50 text-green-600"
+                  ? "bg-blue-50 text-blue-600"
                   : "text-gray-700 hover:bg-gray-100"
               }`}
             >
@@ -83,7 +83,7 @@ const ProcurementSidebar = ({ isOpen, toggleSidebar }) => {
               >
                 <FaFileAlt
                   className={
-                    activeItem === "purchase-requests" ? "text-green-600" : "text-gray-500"
+                    activeItem === "purchase-requests" ? "text-blue-600" : "text-gray-500"
                   }
                 />
                 <span className="font-medium">Purchase Requests</span>
@@ -93,7 +93,7 @@ const ProcurementSidebar = ({ isOpen, toggleSidebar }) => {
             <li
               className={`flex items-center space-x-3 py-3 px-4 rounded-lg cursor-pointer transition-colors duration-200 ${
                 activeItem === "vendors"
-                  ? "bg-green-50 text-green-600"
+                  ? "bg-blue-50 text-blue-600"
                   : "text-gray-700 hover:bg-gray-100"
               }`}
             >
@@ -105,7 +105,7 @@ const ProcurementSidebar = ({ isOpen, toggleSidebar }) => {
                 <FaUsers
                   className={
                     activeItem === "vendors"
-                      ? "text-green-600"
+                      ? "text-blue-600"
                       : "text-gray-500"
                   }
                 />
@@ -116,7 +116,7 @@ const ProcurementSidebar = ({ isOpen, toggleSidebar }) => {
             <li
               className={`flex items-center space-x-3 py-3 px-4 rounded-lg cursor-pointer transition-colors duration-200 ${
                 activeItem === "orders"
-                  ? "bg-green-50 text-green-600"
+                  ? "bg-blue-50 text-blue-600"
                   : "text-gray-700 hover:bg-gray-100"
               }`}
             >
@@ -128,7 +128,7 @@ const ProcurementSidebar = ({ isOpen, toggleSidebar }) => {
                 <FaShoppingCart
                   className={
                     activeItem === "orders"
-                      ? "text-green-600"
+                      ? "text-blue-600"
                       : "text-gray-500"
                   }
                 />
@@ -139,7 +139,7 @@ const ProcurementSidebar = ({ isOpen, toggleSidebar }) => {
             <li
               className={`flex items-center space-x-3 py-3 px-4 rounded-lg cursor-pointer transition-colors duration-200 ${
                 activeItem === "reports"
-                  ? "bg-green-50 text-green-600"
+                  ? "bg-blue-50 text-blue-600"
                   : "text-gray-700 hover:bg-gray-100"
               }`}
             >
@@ -151,7 +151,7 @@ const ProcurementSidebar = ({ isOpen, toggleSidebar }) => {
                 <FaClipboardList
                   className={
                     activeItem === "reports"
-                      ? "text-green-600"
+                      ? "text-blue-600"
                       : "text-gray-500"
                   }
                 />
@@ -162,7 +162,7 @@ const ProcurementSidebar = ({ isOpen, toggleSidebar }) => {
             <li
               className={`flex items-center space-x-3 py-3 px-4 rounded-lg cursor-pointer transition-colors duration-200 ${
                 activeItem === "settings"
-                  ? "bg-green-50 text-green-600"
+                  ? "bg-blue-50 text-blue-600"
                   : "text-gray-700 hover:bg-gray-100"
               }`}
             >
@@ -174,7 +174,7 @@ const ProcurementSidebar = ({ isOpen, toggleSidebar }) => {
                 <FaCog
                   className={
                     activeItem === "settings"
-                      ? "text-green-600"
+                      ? "text-blue-600"
                       : "text-gray-500"
                   }
                 />

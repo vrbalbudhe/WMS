@@ -245,7 +245,7 @@ const InventoryManagement = () => {
           <div className="flex space-x-2">
             <button 
               onClick={handleAddNewItem}
-              className="flex items-center text-white bg-purple-600 hover:bg-purple-700 py-2 px-4 rounded-lg"
+              className="flex items-center text-white bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-lg"
             >
               <FaPlus className="mr-2" />
               Add Item
@@ -282,7 +282,7 @@ const InventoryManagement = () => {
                   </div>
                   <input
                     type="text"
-                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Search by name or ID..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -302,7 +302,7 @@ const InventoryManagement = () => {
               {(filters.category.length > 0 || filters.status.length > 0 || filters.supplier.length > 0) && (
                 <div className="flex flex-wrap gap-2 mt-3">
                   {filters.category.map(cat => (
-                    <span key={`cat-${cat}`} className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full flex items-center">
+                    <span key={`cat-${cat}`} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full flex items-center">
                       {cat}
                       <button 
                         className="ml-1 focus:outline-none" 

@@ -15,7 +15,7 @@ const InventoryTable = ({
     if (sortField !== field) {
       return <FaSort className="text-gray-400" />;
     }
-    return sortDirection === 'asc' ? <FaSortUp className="text-purple-600" /> : <FaSortDown className="text-purple-600" />;
+    return sortDirection === 'asc' ? <FaSortUp className="text-blue-600" /> : <FaSortDown className="text-blue-600" />;
   };
   
   // Function to get status badge style
@@ -142,7 +142,7 @@ const InventoryTable = ({
                   <div className="flex justify-end space-x-1">
                     <button 
                       onClick={() => onView(item)} 
-                      className="text-purple-600 hover:text-purple-900"
+                      className="text-blue-600 hover:text-blue-900"
                       title="View details"
                     >
                       <FaEye size={16} />
