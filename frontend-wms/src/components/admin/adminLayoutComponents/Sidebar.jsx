@@ -1,7 +1,5 @@
-// Path: frontend-wms/src/components/admin/adminLayoutComponents/Sidebar.jsx
-
-// Import statements remain the same
-import React, { useState } from "react";
+// Path: frontend-wms\src\components\admin\adminLayoutComponents\Sidebar.jsx
+import React, { useState, useContext } from "react";
 import {
   FaChartBar,
   FaUser,
@@ -9,15 +7,44 @@ import {
   FaSignOutAlt,
   FaBars,
   FaTimes,
-  FaWarehouse,  // Add this import
+  FaWarehouse,
 } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../../../contexts/AuthContext";
+import axios from "axios";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [activeItem, setActiveItem] = useState("dashboard");
+  const { refreshLoginContext, setLoading } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const handleItemClick = (item) => {
     setActiveItem(item);
+  };
+
+  const handleLogout = async () => {
+    try {
+      console.log("Logging out from admin sidebar");
+      setLoading(true);
+      
+      const response = await axios.post(
+        "http://localhost:8000/api/auth/logout",
+        {},
+        { withCredentials: true }
+      );
+
+      console.log("Logout response:", response.data);
+      
+      // Even if the response has an error, we'll still clear local state
+      await refreshLoginContext();
+      
+      // Navigate to home page
+      navigate("/");
+    } catch (err) {
+      console.error("Logout error:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -103,7 +130,13 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               <Link
                 to="/admin/create-users"
                 className="flex items-center space-x-3"
+                onClick={() => handleItemClick("users")}
               >
+                <FaUser
+                  className={
+                    activeItem === "users" ? "text-blue-600" : "text-gray-500"
+                  }
+                />
                 <FaUser
                   className={
                     activeItem === "users" ? "text-blue-600" : "text-gray-500"
@@ -113,10 +146,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               </Link>
             </li>
 
-            {/* Rest of the sidebar items remain the same */}
             <li
               className={`flex items-center space-x-3 py-3 px-4 rounded-lg cursor-pointer transition-colors duration-200 ${
-                activeItem === "Procurement Officers"
+                activeItem === "procurement-officers"
                   ? "bg-blue-50 text-blue-600"
                   : "text-gray-700 hover:bg-gray-100"
               }`}
@@ -124,10 +156,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               <Link
                 to="/admin/procurement-officers"
                 className="flex items-center space-x-3"
+                onClick={() => handleItemClick("procurement-officers")}
               >
                 <FaUser
                   className={
-                    activeItem === "Procurement Officers"
+                    activeItem === "procurement-officers"
                       ? "text-blue-600"
                       : "text-gray-500"
                   }
@@ -138,7 +171,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
             <li
               className={`flex items-center space-x-3 py-3 px-4 rounded-lg cursor-pointer transition-colors duration-200 ${
-                activeItem === "Warehouse Officers"
+                activeItem === "warehouse-officers"
                   ? "bg-blue-50 text-blue-600"
                   : "text-gray-700 hover:bg-gray-100"
               }`}
@@ -146,34 +179,16 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               <Link
                 to="/admin/warehouse-officers"
                 className="flex items-center space-x-3"
+                onClick={() => handleItemClick("warehouse-officers")}
               >
                 <FaUser
                   className={
-                    activeItem === "Warehouse Officers"
+                    activeItem === "warehouse-officers"
                       ? "text-blue-600"
                       : "text-gray-500"
                   }
                 />
                 <span className="font-medium">Warehouse Officers</span>
-              </Link>
-            </li>
-
-            <li
-              className={`flex items-center space-x-3 py-3 px-4 rounded-lg cursor-pointer transition-colors duration-200 ${
-                activeItem === "Assets Deals"
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              <Link to="/assets-deals" className="flex items-center space-x-3">
-                <FaUser
-                  className={
-                    activeItem === "Assets Deals"
-                      ? "text-blue-600"
-                      : "text-gray-500"
-                  }
-                />
-                <span className="font-medium">Assets Deals</span>
               </Link>
             </li>
 
@@ -208,7 +223,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                   : "text-gray-700 hover:bg-gray-100"
               }`}
             >
-              <Link to="/settings" className="flex items-center space-x-3">
+              <Link
+                to="/admin/settings"
+                className="flex items-center space-x-3"
+                onClick={() => handleItemClick("settings")}
+              >
                 <FaCog
                   className={
                     activeItem === "settings"
@@ -224,10 +243,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           <div className="absolute bottom-8 w-full px-2">
             <div className="border-t border-gray-200 pt-4 mx-4 mb-2"></div>
             <div
-              className="flex items-center space-x-3 py-3 px-4 mx-2 rounded-lg cursor-pointer text-gray-700 hover:bg-gray-100 transition-colors duration-200"
-              onClick={() => handleItemClick("logout")}
+              className="flex items-center space-x-3 py-3 px-4 mx-2 rounded-lg cursor-pointer text-red-500 hover:bg-red-50 transition-colors duration-200"
+              onClick={handleLogout}
             >
-              <FaSignOutAlt className="text-gray-500" />
+              <FaSignOutAlt className="text-red-500" />
               <span className="font-medium">Logout</span>
             </div>
           </div>

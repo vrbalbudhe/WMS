@@ -23,5 +23,5 @@ router.get('/warehouses', only_admin_role, warehouseController.getAllWarehouses)
 router.get('/:id', warehouseController.getWarehouseById);
 router.put('/:id', warehouseController.updateWarehouse);
 router.delete('/:id', warehouseController.deleteWarehouse);
-
+router.get('/dropdown', warehouseController.getWarehousesForDropdown);
 module.exports = router;
