@@ -1,19 +1,21 @@
 // Path: frontend-wms\src\components\admin\adminSections\UserManagement\UserList.jsx
 import { useState, useEffect } from "react";
 import axios from "axios";
-import {
-  MoreHorizontal,
-  Edit,
-  Trash2,
-  Shield,
-  UserX,
-  RefreshCw,
-  Search,
-  Filter,
-  CheckCircle,
-  XCircle,
-  AlertCircle
-} from "lucide-react";
+import { 
+    MoreHorizontal,
+    Edit,
+    Trash2,
+    Shield,
+    UserX,
+    RefreshCw,
+    Search,
+    Filter,
+    CheckCircle,
+    XCircle,
+    AlertCircle,
+    User  // Add this import
+  } from "lucide-react";
+  import { Link } from "react-router-dom";
 import EditUserModal from "./EditUserModal";
 import ConfirmationModal from "./ConfirmationModal";
 
