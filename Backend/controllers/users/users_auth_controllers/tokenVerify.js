@@ -1,35 +1,46 @@
-const asyncHandler = require("express-async-handler");
-const jwt = require("jsonwebtoken");
+// Backend\controllers\users\users_auth_controllers\tokenVerify.js
+const jwt = require('jsonwebtoken');
+const asyncHandler = require('express-async-handler');
 
-const TokenVerification = asyncHandler(async (req, res) => {
-  const token = req.cookies.token;
+const tokenVerify = asyncHandler(async (req, res) => {
   try {
+    const token = req.cookies.token;
+    
+    console.log("Token verification request, cookie exists:", !!token);
+    
     if (!token) {
-      return res.status(401).json({
-        message: "User is Not Authenticated",
+      return res.status(200).json({
         success: false,
+        message: 'No token found',
+        payload: null
       });
     }
-    jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, payload) => {
-      if (err) {
-        return res.status(401).json({
-          message: "User is Not Authenticated",
-          success: false,
-        });
-      }
-      req.userId = payload.userId;
+
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+      console.log("Token verified successfully:", decoded);
+      
       return res.status(200).json({
-        message: "User Info Fetced Sucessfully!! || User is Logged In",
-        payload,
+        success: true,
+        message: 'Token is valid',
+        payload: decoded
       });
-    });
+    } catch (jwtError) {
+      console.error("JWT verification error:", jwtError);
+      return res.status(200).json({
+        success: false,
+        message: 'Invalid token: ' + jwtError.message,
+        payload: null
+      });
+    }
   } catch (error) {
-    console.log(error);
-    res.status(501).json({
-      message: "Logout Authentication Failed",
+    console.error('Token verification error:', error);
+    return res.status(200).json({
       success: false,
+      message: 'Error processing token: ' + error.message,
+      payload: null
     });
   }
 });
 
-module.exports = TokenVerification;
+module.exports = { tokenVerify };

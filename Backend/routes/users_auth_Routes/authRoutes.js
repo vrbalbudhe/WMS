@@ -1,17 +1,17 @@
+// routes/users_auth_Routes/authRoutes.js
 const express = require("express");
+const { userLogin } = require("../../controllers/users/users_auth_controllers/login");
 const { logout } = require("../../controllers/users/users_auth_controllers/logout");
-const TokenVerification = require("../../controllers/users/users_auth_controllers/tokenVerify");
-const { OtherUsersLogin } = require("../../controllers/users/users_auth_controllers/login");
+const { changePassword } = require("../../controllers/users/users_auth_controllers/changePassword");
+const verifyToken = require("../../middlewares/verifyTokenMW");
+const { tokenVerify } = require("../../controllers/users/users_auth_controllers/tokenVerify");
 
 const router = express.Router();
 
-// USER LOGIN ROUTE
-router.post("/login", OtherUsersLogin);
-
-// USER LOGOUT ROUTE
+// Authentication routes
+router.post("/login", userLogin);
 router.post("/logout", logout);
-
-// USER TOKEN VERIFICATION
-router.get("/isToken", TokenVerification);
+router.post("/change-password", verifyToken, changePassword);
+router.get("/isToken", tokenVerify); // Make sure this uses the actual exported function
 
 module.exports = router;

@@ -64,13 +64,14 @@ function App() {
           path: "dashboard",
           element: <Dashboard />,
         },
-        {
-          path: "create-users",
-          element: <UserRegistration />,
-        },
+       
         {
           path: "procurement-officers",
           element: <ProcurementOffInfo />,
+        },
+        {
+          path: "create-users",
+          element: <UserRegistration />,
         },
         {
           path: "warehouse-officers",

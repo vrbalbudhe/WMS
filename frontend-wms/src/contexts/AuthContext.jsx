@@ -1,6 +1,7 @@
-import React, { createContext, useEffect, useState } from "react";
+// frontend-wms\src\contexts\AuthContext.jsx (updated)
+import { createContext, useEffect, useState } from "react";
 import axios from "axios";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { RefreshCw } from "lucide-react";
 
 export const AuthContext = createContext();
 
@@ -14,6 +15,9 @@ export const AuthContextProvider = ({ children }) => {
 
   const fetchUser = async () => {
     try {
+      console.log("Fetching user data...");
+
+      // First, check if the token is valid
       const response = await axios.get(
         "http://localhost:8000/api/auth/isToken",
         {
@@ -21,28 +25,70 @@ export const AuthContextProvider = ({ children }) => {
         }
       );
 
-      const userInfo = response?.data?.payload;
-      if (userInfo) {
-        if (userInfo.role !== "ADMIN") {
-          const response1 = await axios.get(
-            `http://localhost:8000/api/user/${userInfo?.email}`
-          );
-          setCurrentUser(response1?.data?.userInfo);
-        } else {
-          const response2 = await axios.get(
-            `http://localhost:8000/api/admin/fetch/${userInfo?.email}`
-          );
-          setCurrentUser(response2?.data?.userInfo);
+      console.log("Token verification response:", response.data);
+
+      if (response?.data?.success && response?.data?.payload) {
+        const userInfo = response?.data?.payload;
+        let userData;
+
+        try {
+          if (userInfo.role === "ADMIN") {
+            // Fetch admin details
+            console.log("Fetching admin details...");
+            const adminResponse = await axios.get(
+              `http://localhost:8000/api/admin/fetch/${userInfo?.email}`
+            );
+
+            console.log("Admin data response:", adminResponse.data);
+
+            userData = {
+              ...adminResponse?.data?.userInfo,
+              userType: "ADMIN" // Ensure userType is set for admins
+            };
+          } else {
+            // Fetch regular user details including warehouse info
+            console.log("Fetching user details...");
+            const userResponse = await axios.get(
+              `http://localhost:8000/api/user/${userInfo?.email}`,
+              { withCredentials: true }
+            );
+
+            console.log("User data response:", userResponse.data);
+
+            userData = userResponse?.data?.userInfo;
+          }
+
+          console.log("Setting user data:", userData);
+          setCurrentUser(userData);
+        } catch (userDetailsError) {
+          console.error("Error fetching user details:", userDetailsError);
+          // Even if details fetch fails, we know the user is authenticated
+          setCurrentUser({
+            id: userInfo.id,
+            email: userInfo.email,
+            userType: userInfo.role,
+            warehouseId: userInfo.warehouseId,
+            // Basic info from token
+          });
         }
       } else {
+        console.log("Token verification failed or no payload");
         setCurrentUser(null);
       }
     } catch (error) {
+      // Handle 401 errors gracefully - just means not logged in
+      if (error.response && error.response.status === 401) {
+        console.log("Not authenticated (401)");
+      } else {
+        console.error("Auth context error:", error);
+      }
       setCurrentUser(null);
     } finally {
       setLoading(false);
     }
   };
+
+
 
   useEffect(() => {
     fetchUser();
@@ -50,24 +96,34 @@ export const AuthContextProvider = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="w-screen h-screen flex justify-center items-center backdrop-blur-md">
-        <AiOutlineLoading3Quarters className="animate-spin text-blue-600 text-5xl" />
+      <div className="w-screen h-screen flex flex-col justify-center items-center bg-white">
+        <RefreshCw className="h-10 w-10 text-blue-600 animate-spin mb-4" />
+        <p className="text-gray-600">Loading...</p>
       </div>
     );
   }
 
+  // Context value with all necessary user info and functions
+  const contextValue = {
+    currentUser,
+    setCurrentUser,
+    fetchUser,
+    setLoading,
+    loading,
+    refreshLoginContext,
+    isAdmin: currentUser?.userType === "ADMIN",
+    isProcurementOfficer: currentUser?.userType === "procurement_officer",
+    isWarehouseManager: currentUser?.userType === "warehouse_manager",
+    warehouseId: currentUser?.warehouseId,
+    warehouseName: currentUser?.warehouse?.name,
+    mustChangePassword: currentUser?.mustChangePassword || false
+  };
+
   return (
-    <AuthContext.Provider
-      value={{
-        currentUser,
-        setCurrentUser,
-        fetchUser,
-        setLoading,
-        loading,
-        refreshLoginContext,
-      }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+export default AuthContextProvider;

@@ -1,14 +1,47 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+// frontend-wms\src\components\layoutComponents\Sidebar.jsx
+import { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 import { FiHome, FiUser, FiSettings, FiLogOut } from "react-icons/fi";
+import { AuthContext } from "../../contexts/AuthContext";
+import axios from "axios";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
-
+  const { currentUser, refreshLoginContext, setLoading } = useContext(AuthContext);
+  const navigate = useNavigate();
+  
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
+  
+  const handleLogout = async () => {
+    try {
+      console.log("Logging out from sidebar");
+      setLoading(true);
+      
+      const response = await axios.post(
+        "http://localhost:8000/api/auth/logout",
+        {},
+        { withCredentials: true }
+      );
+
+      console.log("Logout response:", response.data);
+      
+      // Even if the response has an error, we'll still clear local state
+      await refreshLoginContext();
+      
+      // Navigate to home page
+      navigate("/");
+    } catch (err) {
+      console.error("Logout error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Only show sidebar if user is logged in
+  if (!currentUser) return null;
 
   return (
     <div className="flex">
@@ -19,15 +52,14 @@ const Sidebar = () => {
       >
         {isOpen ? <AiOutlineClose size={24} /> : <AiOutlineMenu size={24} />}
       </button>
-
       {/* Sidebar */}
       <div
         className={`fixed top-0 left-0 h-full w-64 bg-gray-800 text-white shadow-lg transform ${
           isOpen ? "translate-x-0" : "-translate-x-64"
-        } transition-transform duration-300`}
+        } transition-transform duration-300 z-40`}
       >
         <div className="p-5 font-bold text-lg border-b border-gray-700">
-          My Dashboard
+          {currentUser?.name || "My Dashboard"}
         </div>
         <ul className="mt-4 space-y-2">
           <li>
@@ -58,7 +90,10 @@ const Sidebar = () => {
             </Link>
           </li>
           <li>
-            <button className="flex w-full items-center gap-3 p-3 hover:bg-red-600 transition">
+            <button 
+              onClick={handleLogout}
+              className="flex w-full items-center gap-3 p-3 hover:bg-red-600 transition"
+            >
               <FiLogOut size={20} />
               Logout
             </button>
