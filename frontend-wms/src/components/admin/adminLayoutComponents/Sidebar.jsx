@@ -1,3 +1,6 @@
+// Path: frontend-wms/src/components/admin/adminLayoutComponents/Sidebar.jsx
+
+// Import statements remain the same
 import React, { useState } from "react";
 import {
   FaChartBar,
@@ -6,6 +9,7 @@ import {
   FaSignOutAlt,
   FaBars,
   FaTimes,
+  FaWarehouse,  // Add this import
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
@@ -65,6 +69,30 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               </Link>
             </li>
 
+            {/* Add Warehouse Management Link */}
+            <li
+              className={`flex items-center space-x-3 py-3 px-4 rounded-lg cursor-pointer transition-colors duration-200 ${
+                activeItem === "warehouses"
+                  ? "bg-blue-50 text-blue-600"
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              <Link
+                to="/admin/warehouses"
+                className="flex items-center space-x-3"
+                onClick={() => handleItemClick("warehouses")}
+              >
+                <FaWarehouse
+                  className={
+                    activeItem === "warehouses"
+                      ? "text-blue-600"
+                      : "text-gray-500"
+                  }
+                />
+                <span className="font-medium">Warehouses</span>
+              </Link>
+            </li>
+
             <li
               className={`flex items-center space-x-3 py-3 px-4 rounded-lg cursor-pointer transition-colors duration-200 ${
                 activeItem === "users"
@@ -85,6 +113,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               </Link>
             </li>
 
+            {/* Rest of the sidebar items remain the same */}
             <li
               className={`flex items-center space-x-3 py-3 px-4 rounded-lg cursor-pointer transition-colors duration-200 ${
                 activeItem === "Procurement Officers"
@@ -145,6 +174,30 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                   }
                 />
                 <span className="font-medium">Assets Deals</span>
+              </Link>
+            </li>
+
+            {/* Add Warehouse Settings Link */}
+            <li
+              className={`flex items-center space-x-3 py-3 px-4 rounded-lg cursor-pointer transition-colors duration-200 ${
+                activeItem === "warehouse-settings"
+                  ? "bg-blue-50 text-blue-600"
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              <Link
+                to="/admin/warehouse-settings"
+                className="flex items-center space-x-3"
+                onClick={() => handleItemClick("warehouse-settings")}
+              >
+                <FaCog
+                  className={
+                    activeItem === "warehouse-settings"
+                      ? "text-blue-600"
+                      : "text-gray-500"
+                  }
+                />
+                <span className="font-medium">Warehouse Settings</span>
               </Link>
             </li>
 

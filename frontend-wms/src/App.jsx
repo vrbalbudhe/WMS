@@ -1,3 +1,5 @@
+// Path: frontend-wms/src/App.jsx
+
 import { createBrowserRouter, RouterProvider } from "react-router-dom"; // Add missing imports
 import { PublicLayout } from "./layouts/PublicLayout";
 import { ProtectedLayout } from "./layouts/ProtectedLayout";
@@ -5,21 +7,21 @@ import Homepage from "./pages/Homepage";
 import React from "react";
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
-
 // Admin
 import { AdminLayout } from "./layouts/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
 import UserRegistration from "./pages/admin/UserRegistration";
 import ProcurementOffInfo from "./pages/admin/ProcurementOfficerInfo";
 import WarehouseOfficerInfo from "./pages/admin/WarehouseOfficerInfo";
-
+// New Warehouse Management Pages
+import WarehouseManagement from "./pages/admin/WarehouseManagement";
+import WarehouseSettings from "./pages/admin/WarehouseSettings";
 // WareHouse Officer
 import { WarehouseLayout } from "./layouts/WarehouseLayout";
 import WarehouseDashboard from "./pages/warehouse/WarehouseDashboard";
 import InventoryManagement from "./pages/warehouse/InventoryManagement";
 import ShipmentTracking from "./pages/warehouse/ShipmentTracking";
 import StockReports from "./pages/warehouse/StockReports";
-
 // Procurement Officer
 import { ProcurementLayout } from "./layouts/ProcurementLayout";
 import ProcurementDashboard from "./pages/procurement/ProcurementDashboard";
@@ -73,6 +75,15 @@ function App() {
         {
           path: "warehouse-officers",
           element: <WarehouseOfficerInfo />,
+        },
+        // Add new warehouse management routes
+        {
+          path: "warehouses",
+          element: <WarehouseManagement />,
+        },
+        {
+          path: "warehouse-settings",
+          element: <WarehouseSettings />,
         },
       ],
     },
