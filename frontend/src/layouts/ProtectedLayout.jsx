@@ -1,18 +1,56 @@
-import { Navigate, Outlet } from "react-router-dom";
+// frontend-wms\src\layouts\ProtectedLayout.jsx
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import Navbar from "../components/layoutComponents/Navbar";
 import Footer from "../components/layoutComponents/Footer";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import Sidebar from "../components/layoutComponents/Sidebar";
 import HomepageSidebar from "../components/homepage/HomepageSidebar";
 
 export const ProtectedLayout = () => {
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, loading } = useContext(AuthContext);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const navigate = useNavigate();
 
-  if (!currentUser) return <Navigate to="/" />;
+  useEffect(() => {
+    // Redirect users to their appropriate dashboard based on role
+    if (currentUser && !loading) {
+      const path = getRedirectPathForRole(currentUser.userType);
+      if (path && window.location.pathname === "/user") {
+        navigate(path);
+      }
+    }
+  }, [currentUser, loading, navigate]);
+
+  const getRedirectPathForRole = (userType) => {
+    switch (userType) {
+      case "ADMIN":
+        return "/admin/dashboard";
+      case "warehouse_manager":
+        return "/warehouse/dashboard";
+      case "procurement_officer":
+        return "/procurement/dashboard";
+      default:
+        return null;
+    }
+  };
+
+  // If not authenticated, redirect to home page
+  if (!currentUser && !loading) {
+    return <Navigate to="/" />;
+  }
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-
+  
   return (
     <div className="min-h-screen w-full flex bg-white">
       <HomepageSidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />

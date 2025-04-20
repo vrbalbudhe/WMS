@@ -1,19 +1,59 @@
-import { useState } from "react";
-import { User, Mail, Phone, Lock, Camera, Send } from "lucide-react";
+// frontend-wms\src\pages\admin\UserRegistration.jsx (updated)
+import { useState, useEffect } from "react";
+import { User, Mail, Phone, Lock, Building, Send, Briefcase, Tag } from "lucide-react";
+import axios from "axios";
 
 export default function UserRegistration() {
+  const [warehouses, setWarehouses] = useState([]);
   const [formData, setFormData] = useState({
     email: "",
     name: "",
     password: "",
     confirmPassword: "",
     phone: "",
+    employeeId: "",
+    warehouseId: "",
     userType: "procurement_officer",
   });
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [generatedPassword, setGeneratedPassword] = useState("");
+
+  // Fetch warehouses for dropdown
+  // In the useEffect that fetches warehouses:
+  useEffect(() => {
+    const fetchWarehouses = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8000/api/admin",  // This is your getAllWarehouses endpoint
+          { withCredentials: true }
+        );
+        console.log("Unexpected warehouse data format:", response?.data?.data);
+        setWarehouses(response?.data?.data);
+      } catch (error) {
+        console.error("Error fetching warehouses:", error);
+      }
+    };
+
+    fetchWarehouses();
+  }, []);
+
+  const generateRandomPassword = () => {
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+    let password = "";
+    for (let i = 0; i < 10; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    setGeneratedPassword(password);
+    setFormData(prev => ({
+      ...prev,
+      password,
+      confirmPassword: password
+    }));
+  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -47,6 +87,11 @@ export default function UserRegistration() {
       newErrors.phone = "Phone number is invalid";
     }
 
+    // Warehouse validation
+    if (!formData.warehouseId) {
+      newErrors.warehouseId = "Warehouse is required";
+    }
+
     return newErrors;
   };
 
@@ -60,79 +105,100 @@ export default function UserRegistration() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const formErrors = validateForm();
     setErrors(formErrors);
-
+  
     if (Object.keys(formErrors).length === 0) {
       setIsSubmitting(true);
-
+  
       try {
-        const registerResponse = await fetch(
-          "http://localhost:8000/api/admin/oul/register",
+        console.log("Sending user data:", formData);
+        
+        // Create a clean version of the data (removing confirmPassword)
+        const dataToSend = {
+          email: formData.email,
+          name: formData.name,
+          password: formData.password,
+          phone: formData.phone || null, // Ensure phone is null if empty
+          employeeId: formData.employeeId || null,
+          warehouseId: formData.warehouseId || null,
+          userType: formData.userType
+        };
+  
+        // Register the user
+        const registerResponse = await axios.post(
+          "http://localhost:8000/api/admin/users/register",
+          dataToSend,
           {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-            body: JSON.stringify(formData),
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true,
           }
         );
-        console.log(registerResponse);
-
-        if (!registerResponse.ok) {
-          throw new Error("Failed to register user.");
+  
+        console.log("Registration response:", registerResponse.data);
+  
+        if (!registerResponse.data.success) {
+          throw new Error(registerResponse.data.message || "Failed to register user.");
         }
-
-        const sendCredsResponse = await fetch(
-          "http://localhost:8000/api/admin/oul/send-credintials",
+  
+        // Send credentials email
+        const sendCredsResponse = await axios.post(
+          "http://localhost:8000/api/admin/users/send-credentials",
+          { 
+            email: formData.email,
+            password: formData.password
+          },
           {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-            body: JSON.stringify({ email: formData?.email }),
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true,
           }
         );
-
-        if (!sendCredsResponse.ok) {
-          await fetch("http://localhost:8000/api/admin/oul/delete", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-            body: JSON.stringify({ email: formData?.email }),
-          });
-
+  
+        if (!sendCredsResponse.data.success) {
+          // Attempt to delete the user if email sending fails
+          await axios.post(
+            "http://localhost:8000/api/admin/users/delete",
+            { email: formData.email },
+            {
+              headers: { "Content-Type": "application/json" },
+              withCredentials: true,
+            }
+          );
+  
           throw new Error(
-            "Failed to send credentials. User registration rolled back."
+            sendCredsResponse.data.message || "Failed to send credentials. User registration rolled back."
           );
         }
-
+  
         setSuccessMessage(
-          `User registered successfully! Verification email sent to ${formData.email}`
+          `User registered successfully! Credentials email sent to ${formData.email}`
         );
-
+  
+        // Reset form
         setFormData({
           email: "",
           name: "",
           password: "",
           confirmPassword: "",
           phone: "",
+          employeeId: "",
+          warehouseId: "",
           userType: "procurement_officer",
         });
+        setGeneratedPassword("");
       } catch (error) {
         console.error("Registration process error:", error);
-        setErrors({ submit: error.message });
+        console.error("Error response data:", error.response?.data);
+        
+        setErrors({ 
+          submit: error.response?.data?.error || error.response?.data?.message || error.message || "Registration failed. Please try again." 
+        });
       } finally {
         setIsSubmitting(false);
       }
     }
   };
-
   return (
     <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200 max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-6">
@@ -211,8 +277,119 @@ export default function UserRegistration() {
             )}
           </div>
 
+          {/* Employee ID Field */}
+          <div className="col-span-2 md:col-span-1">
+            <label
+              className="block text-sm font-medium text-gray-700 mb-1"
+              htmlFor="employeeId"
+            >
+              Employee ID
+            </label>
+            <div className="flex items-center">
+              <span className="flex items-center justify-center bg-gray-100 border border-r-0 border-gray-300 rounded-l-md p-2">
+                <Tag size={18} className="text-gray-500" />
+              </span>
+              <input
+                id="employeeId"
+                name="employeeId"
+                type="text"
+                value={formData.employeeId}
+                onChange={handleChange}
+                className="flex-1 block w-full rounded-r-md border border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
+                placeholder="EMP12345"
+              />
+            </div>
+            {errors.employeeId && (
+              <p className="mt-1 text-sm text-red-600">{errors.employeeId}</p>
+            )}
+          </div>
+
+          {/* Phone Field */}
+          <div className="col-span-2 md:col-span-1">
+            <label
+              className="block text-sm font-medium text-gray-700 mb-1"
+              htmlFor="phone"
+            >
+              Phone Number
+            </label>
+            <div className="flex items-center">
+              <span className="flex items-center justify-center bg-gray-100 border border-r-0 border-gray-300 rounded-l-md p-2">
+                <Phone size={18} className="text-gray-500" />
+              </span>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={handleChange}
+                className="flex-1 block w-full rounded-r-md border border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
+                placeholder="+1 (555) 000-0000"
+              />
+            </div>
+            {errors.phone && (
+              <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+            )}
+          </div>
+
+          {/* Warehouse Selection */}
+          <div className="col-span-2 md:col-span-1">
+            <label
+              className="block text-sm font-medium text-gray-700 mb-1"
+              htmlFor="warehouseId"
+            >
+              Assigned Warehouse
+            </label>
+            <div className="flex items-center">
+              <span className="flex items-center justify-center bg-gray-100 border border-r-0 border-gray-300 rounded-l-md p-2">
+                <Building size={18} className="text-gray-500" />
+              </span>
+              <select
+                id="warehouseId"
+                name="warehouseId"
+                value={formData.warehouseId}
+                onChange={handleChange}
+                className="flex-1 block w-full rounded-r-md border border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
+              >
+                <option value="">Select a warehouse</option>
+                {warehouses.map((warehouse) => (
+                  <option key={warehouse.id} value={warehouse.id}>
+                    {warehouse.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {errors.warehouseId && (
+              <p className="mt-1 text-sm text-red-600">{errors.warehouseId}</p>
+            )}
+          </div>
+
+          {/* User Type Selection */}
+          <div className="col-span-2 md:col-span-1">
+            <label
+              className="block text-sm font-medium text-gray-700 mb-1"
+              htmlFor="userType"
+            >
+              User Type
+            </label>
+            <div className="flex items-center">
+              <span className="flex items-center justify-center bg-gray-100 border border-r-0 border-gray-300 rounded-l-md p-2">
+                <Briefcase size={18} className="text-gray-500" />
+              </span>
+              <select
+                id="userType"
+                name="userType"
+                value={formData.userType}
+                onChange={handleChange}
+                className="flex-1 block w-full rounded-r-md border border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
+              >
+                <option value="procurement_officer">Procurement Officer</option>
+                <option value="warehouse_manager">Warehouse Manager</option>
+              </select>
+            </div>
+          </div>
+
           {/* Password Field */}
-          <div>
+          <div className="col-span-2 md:col-span-1">
             <label
               className="block text-sm font-medium text-gray-700 mb-1"
               htmlFor="password"
@@ -239,7 +416,7 @@ export default function UserRegistration() {
           </div>
 
           {/* Confirm Password Field */}
-          <div>
+          <div className="col-span-2 md:col-span-1">
             <label
               className="block text-sm font-medium text-gray-700 mb-1"
               htmlFor="confirmPassword"
@@ -267,59 +444,29 @@ export default function UserRegistration() {
             )}
           </div>
 
-          {/* Phone Field */}
-          <div>
-            <label
-              className="block text-sm font-medium text-gray-700 mb-1"
-              htmlFor="phone"
+          {/* Password Generator Button */}
+          <div className="col-span-2 mt-2">
+            <button
+              type="button"
+              onClick={generateRandomPassword}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              Phone Number (optional)
-            </label>
-            <div className="flex items-center">
-              <span className="flex items-center justify-center bg-gray-100 border border-r-0 border-gray-300 rounded-l-md p-2">
-                <Phone size={18} className="text-gray-500" />
-              </span>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                value={formData.phone}
-                onChange={handleChange}
-                className="flex-1 block w-full rounded-r-md border border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
-                placeholder="+1 (555) 000-0000"
-              />
-            </div>
-            {errors.phone && (
-              <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+              <Lock className="mr-2 h-4 w-4" />
+              Generate Secure Password
+            </button>
+            {generatedPassword && (
+              <div className="mt-2 p-2 bg-gray-100 rounded-md">
+                <p className="text-sm font-medium text-gray-800">Generated Password: <span className="font-mono">{generatedPassword}</span></p>
+                <p className="text-xs text-gray-500 mt-1">This password will be emailed to the user.</p>
+              </div>
             )}
-          </div>
-
-          {/* User Type Selection */}
-          <div>
-            <label
-              className="block text-sm font-medium text-gray-700 mb-1"
-              htmlFor="userType"
-            >
-              User Type
-            </label>
-            <select
-              id="userType"
-              name="userType"
-              value={formData.userType}
-              onChange={handleChange}
-              className="block w-full rounded-md border border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
-            >
-              <option value="procurement_officer">Procurement Officer</option>
-              <option value="warehouse_manager">Warehouse Manager</option>
-            </select>
           </div>
 
           {/* Email Verification Notice */}
           <div className="col-span-2 mt-2">
             <div className="text-sm text-gray-500">
-              After registration, a confirmation link will be sent to the
-              provided email address. User will be required to change their
-              password upon first login.
+              <p>After registration, login credentials will be sent to the provided email address.</p>
+              <p>The user will be required to change their password upon first login.</p>
             </div>
           </div>
 
