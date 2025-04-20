@@ -12,7 +12,7 @@ const crypto = require("crypto");
  */
 const resetPassword = asyncHandler(async (req, res) => {
     const { userId } = req.body;
-    
+    console.log("  -- - -- -- > ", userId)
     try {
         if (!userId) {
             return res.status(400).json({
@@ -20,26 +20,26 @@ const resetPassword = asyncHandler(async (req, res) => {
                 success: false,
             });
         }
-        
+
         // Find the user
         const user = await prisma.user.findUnique({
             where: { id: userId },
             include: { warehouse: true }
         });
-        
+
         if (!user) {
             return res.status(404).json({
                 message: "User not found",
                 success: false,
             });
         }
-        
+
         // Generate a random password
         const newPassword = crypto.randomBytes(8).toString('hex');
-        
+
         // Hash the new password
         const hashedPassword = await bcrypt.hash(newPassword, 10);
-        
+
         // Update the user's password and set mustChangePassword to true
         await prisma.user.update({
             where: { id: userId },
@@ -48,7 +48,7 @@ const resetPassword = asyncHandler(async (req, res) => {
                 mustChangePassword: true
             }
         });
-        
+
         // Configure nodemailer transporter
         const transporter = nodemailer.createTransport({
             service: "gmail",
@@ -57,7 +57,7 @@ const resetPassword = asyncHandler(async (req, res) => {
                 pass: process.env.EMAIL_PASS,
             },
         });
-        
+
         // Prepare email content
         const mailOptions = {
             from: process.env.EMAIL_USER,
@@ -78,10 +78,17 @@ const resetPassword = asyncHandler(async (req, res) => {
                 </div>
             `
         };
-        
+
         // Send the email
-        await transporter.sendMail(mailOptions);
-        
+        const sendingEmail = await transporter.sendMail(mailOptions);
+
+        if (!sendingEmail) {
+            return res.status(200).json({
+                message: "Sorry unable to send email",
+                success: false
+            });
+        }
+
         return res.status(200).json({
             message: "Password reset successfully. A new password has been sent to the user's email.",
             success: true

@@ -1,4 +1,3 @@
-// Path: frontend-wms\src\components\admin\adminSections\UserManagement\UserList.jsx
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { 
@@ -13,9 +12,9 @@ import {
     CheckCircle,
     XCircle,
     AlertCircle,
-    User  // Add this import
+    User
   } from "lucide-react";
-  import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import EditUserModal from "./EditUserModal";
 import ConfirmationModal from "./ConfirmationModal";
 
@@ -350,70 +349,53 @@ export default function UserList({ userType }) {
       </div>
 
       {users.length === 0 && !loading && !error ? (
-  <div className="p-10 text-center">
-    <div className="inline-block p-6 bg-gray-100 rounded-lg mb-4">
-      <User size={40} className="text-gray-400 mx-auto" />
-    </div>
-    <p className="text-gray-500 mb-4">No users found matching your criteria.</p>
-    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-      <button
-        onClick={() => {
-          setStatusFilter("all");
-          setSearchTerm("");
-          setCurrentPage(1);
-        }}
-        className="px-4 py-2 bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
-      >
-        Clear Filters
-      </button>
-      <Link
-        to="/admin/create-users"
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-      >
-        Create New User
-      </Link>
-    </div>
-  </div>
-) : (
+        <div className="p-10 text-center">
+          <div className="inline-block p-6 bg-gray-100 rounded-lg mb-4">
+            <User size={40} className="text-gray-400 mx-auto" />
+          </div>
+          <p className="text-gray-500 mb-4">No users found matching your criteria.</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={() => {
+                setStatusFilter("all");
+                setSearchTerm("");
+                setCurrentPage(1);
+              }}
+              className="px-4 py-2 bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+            >
+              Clear Filters
+            </button>
+            <Link
+              to="/admin/create-users"
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Create New User
+            </Link>
+          </div>
+        </div>
+      ) : (
         <>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+          {/* Table container with responsive styling */}
+          <div className="overflow-x-auto w-full">
+            <table className="min-w-full divide-y divide-gray-200 table-fixed">
               <thead className="bg-gray-50">
                 <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
                     User
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
                     Role & Assignment
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
                     Contact
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
                     Status
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
                     Created
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th scope="col" className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-14">
                     Actions
                   </th>
                 </tr>
@@ -421,7 +403,7 @@ export default function UserList({ userType }) {
               <tbody className="bg-white divide-y divide-gray-200">
                 {users.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
                           {user.avatar ? (
@@ -438,24 +420,24 @@ export default function UserList({ userType }) {
                             </div>
                           )}
                         </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
+                        <div className="ml-4 truncate">
+                          <div className="text-sm font-medium text-gray-900 truncate">
                             {user.name}
                           </div>
-                          <div className="text-sm text-gray-500">{user.email}</div>
+                          <div className="text-sm text-gray-500 truncate">{user.email}</div>
                           {user.employeeId && (
-                            <div className="text-xs text-gray-400">
+                            <div className="text-xs text-gray-400 truncate">
                               ID: {user.employeeId}
                             </div>
                           )}
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
+                    <td className="px-3 py-4 text-sm">
+                      <div className="text-sm text-gray-900 truncate">
                         {getUserTypeLabel(user.userType)}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 truncate">
                         {user.warehouse ? (
                           <span>Warehouse: {user.warehouse.name}</span>
                         ) : (
@@ -463,18 +445,18 @@ export default function UserList({ userType }) {
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
+                    <td className="px-3 py-4 text-sm truncate">
+                      <div className="text-sm text-gray-900 truncate">
                         {user.phone || "No phone number"}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm">
                       {getStatusBadge(user.status, user.mustChangePassword)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-3 py-4 text-sm text-gray-500 truncate">
                       {formatDate(user.createdAt)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium relative">
+                    <td className="px-3 py-4 text-center text-sm font-medium relative">
                       <button
                         onClick={() => toggleActionMenu(user.id)}
                         className="text-gray-400 hover:text-gray-600 focus:outline-none"
@@ -483,7 +465,7 @@ export default function UserList({ userType }) {
                       </button>
 
                       {actionMenuOpen === user.id && (
-                        <div className="absolute right-8 z-10 mt-1 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                        <div className="absolute right-0 z-10 mt-1 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                           <div
                             className="py-1"
                             role="menu"
@@ -599,19 +581,35 @@ export default function UserList({ userType }) {
                     </svg>
                   </button>
 
-                  {[...Array(totalPages)].map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentPage(index + 1)}
-                      className={`relative inline-flex items-center px-4 py-2 border ${
-                        currentPage === index + 1
-                          ? "bg-blue-50 border-blue-500 text-blue-600 z-10"
-                          : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
-                      } text-sm font-medium`}
-                    >
-                      {index + 1}
-                    </button>
-                  ))}
+                  {/* Limit pagination buttons to prevent overflow */}
+                  {[...Array(Math.min(5, totalPages))].map((_, index) => {
+                    // Calculate which page numbers to show
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = index + 1;
+                    } else {
+                      let startPage = Math.max(1, currentPage - 2);
+                      let endPage = Math.min(totalPages, startPage + 4);
+                      if (endPage - startPage < 4) {
+                        startPage = Math.max(1, endPage - 4);
+                      }
+                      pageNum = startPage + index;
+                    }
+                    
+                    return pageNum <= totalPages ? (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentPage(pageNum)}
+                        className={`relative inline-flex items-center px-3 py-2 border ${
+                          currentPage === pageNum
+                            ? "bg-blue-50 border-blue-500 text-blue-600 z-10"
+                            : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                        } text-sm font-medium`}
+                      >
+                        {pageNum}
+                      </button>
+                    ) : null;
+                  })}
 
                   <button
                     onClick={() =>
@@ -682,6 +680,7 @@ export default function UserList({ userType }) {
       )}
     </div>
   );
+  
   if (error) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6 text-center">

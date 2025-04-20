@@ -27,7 +27,7 @@ export default function UserRegistration() {
     const fetchWarehouses = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/admin",  // This is your getAllWarehouses endpoint
+          "http://localhost:8000/api/admin/warehouses",  // This is your getAllWarehouses endpoint
           { withCredentials: true }
         );
         console.log("Unexpected warehouse data format:", response?.data?.data);

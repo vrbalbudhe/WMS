@@ -5,7 +5,6 @@ const prisma = new PrismaClient();
 const only_admin_role = async (req, res, next) => {
   try {
     const token = req?.cookies?.token;
-    console.log("- - - - ", token);
     if (!token) {
       return res.status(401).json({ error: 'Authentication token is required' });
     }

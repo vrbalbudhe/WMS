@@ -153,7 +153,7 @@ const WarehouseSidebar = ({ isOpen, toggleSidebar }) => {
                   : "text-gray-700 hover:bg-gray-100"
               }`}
             >
-              <Link 
+              {/* <Link 
                 to="/warehouse/settings" 
                 className="flex items-center space-x-3 w-full"
                 onClick={() => handleItemClick("settings", "/warehouse/settings")}
@@ -166,7 +166,7 @@ const WarehouseSidebar = ({ isOpen, toggleSidebar }) => {
                   }
                 />
                 <span className="font-medium">Settings</span>
-              </Link>
+              </Link> */}
             </li>
           </ul>
 
