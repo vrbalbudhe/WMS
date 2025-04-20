@@ -28,7 +28,8 @@ const WarehouseFieldSettings = () => {
   const fetchFields = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/admin/fields');
+      const response = await axios.get('http://localhost:8000/api/admin/warehouses/fields');
+      console.log("Response -- ", response)
       setFields(response.data.data || []);
       setLoading(false);
     } catch (error) {
@@ -38,7 +39,7 @@ const WarehouseFieldSettings = () => {
       setFields([]);
     }
   };
-  
+
 
   const resetForm = () => {
     setFormData({
@@ -111,7 +112,7 @@ const WarehouseFieldSettings = () => {
 
   const handleAddOption = () => {
     if (!option.trim()) return;
-    
+
     if (formData.options.includes(option.trim())) {
       setFormErrors({
         ...formErrors,
@@ -125,7 +126,7 @@ const WarehouseFieldSettings = () => {
       options: [...formData.options, option.trim()]
     });
     setOption('');
-    
+
     if (formErrors.options) {
       setFormErrors({
         ...formErrors,
@@ -160,9 +161,9 @@ const WarehouseFieldSettings = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!validateForm()) return;
-  
+
     try {
       if (editingField) {
         // Update existing field
@@ -171,13 +172,13 @@ const WarehouseFieldSettings = () => {
         // Create new field
         await axios.post('/api/admin/fields', formData);
       }
-  
+
       fetchFields();
       setIsModalOpen(false);
       resetForm();
     } catch (error) {
       console.error('Error saving field:', error);
-      
+
       if (error.response && error.response.data && error.response.data.message) {
         alert(`Error: ${error.response.data.message}`);
       } else {
@@ -285,9 +286,8 @@ const WarehouseFieldSettings = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
-                      formErrors.name ? 'border-red-500' : ''
-                    }`}
+                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${formErrors.name ? 'border-red-500' : ''
+                      }`}
                   />
                   {formErrors.name && (
                     <p className="mt-1 text-sm text-red-500">{formErrors.name}</p>
@@ -351,7 +351,7 @@ const WarehouseFieldSettings = () => {
                     {formErrors.options && (
                       <p className="mt-1 text-sm text-red-500">{formErrors.options}</p>
                     )}
-                    
+
                     {formData.options.length > 0 && (
                       <div className="mt-2">
                         <ul className="bg-gray-50 rounded-md p-2">

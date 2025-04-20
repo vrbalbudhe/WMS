@@ -22,7 +22,7 @@ const WarehouseList = () => {
   const fetchWarehouses = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/admin');
+      const response = await axios.get('/api/admin/warehouses');
       setWarehouses(response.data.data || []);
       setLoading(false);
     } catch (error) {
