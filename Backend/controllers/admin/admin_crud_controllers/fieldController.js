@@ -1,12 +1,13 @@
 // Path: Backend/controllers/admin/admin_crud_controllers/fieldController.js
 
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require("../../../lib/prisma");
 
 // Create a new custom field
 exports.createField = async (req, res) => {
   try {
     const { name, type, isRequired, options } = req.body;
+    console.log(name)
+    console.log(type)
 
     // Validate required fields
     if (!name || !type) {
