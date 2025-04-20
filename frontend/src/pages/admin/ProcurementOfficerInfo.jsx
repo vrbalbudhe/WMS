@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Users, PlusCircle } from "lucide-react";
 import { Link } from "react-router-dom";
-import UserList from "../../../../frontend-wms/src/components/admin/adminSections/UserManagement/UserList";
+import UserList from "../../components/admin/adminSections/UserManagement/UserList";
 
 export default function ProcurementOfficerInfo() {
   return (

@@ -1,6 +1,6 @@
 // Path: Backend\routes\admin_Routes\admin_users_routes.js
 const express = require("express");
-const { OtherUsersRegister } = require("../../controllers/admin/admin_users_controllers/register");
+const { OtherUsersRegister } = require("../../controllers/admin/admin_users_controllers/registeer");
 const { sendUserCredentials } = require("../../controllers/admin/admin_users_controllers/email_credintials");
 const { DeleteUser } = require("../../controllers/admin/admin_users_controllers/deleteUser");
 const { getAllUsers } = require("../../controllers/admin/admin_users_controllers/getAllUsers");

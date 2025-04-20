@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Warehouse, PlusCircle } from "lucide-react";
 import { Link } from "react-router-dom";
-import UserList from "../../../../frontend-wms/src/components/admin/adminSections/UserManagement/UserList";
+import UserList from "../../components/admin/adminSections/UserManagement/UserList";
 
 export default function WarehouseOfficerInfo() {
   return (
