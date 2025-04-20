@@ -17,7 +17,7 @@ router.post("/send-credentials", only_admin_role, sendUserCredentials);
 router.post("/delete", only_admin_role, DeleteUser);
 router.get("/", only_admin_role, getAllUsers);
 router.put("/update", only_admin_role, updateUser);
-router.post("/reset-password", only_admin_role, resetPassword);
+router.post("/reset-password", resetPassword);
 router.get("/warehouses", only_admin_role, getWarehouses);
 
 module.exports = router;

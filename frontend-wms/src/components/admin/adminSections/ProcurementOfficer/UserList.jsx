@@ -25,7 +25,7 @@ export default function UserList({ filters }) {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:8000/api/admin/users", {
+      const response = await axios.get("http://localhost:8000/api/a dmin/users", {
         params: {
           page: currentPage,
           limit: 5,
@@ -124,6 +124,7 @@ export default function UserList({ filters }) {
 
   const handleDeleteUser = async (userId) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
+      console.log(userId)
       try {
         const response = await axios.post(
           "http://localhost:8000/api/admin/users/delete",
@@ -169,7 +170,7 @@ export default function UserList({ filters }) {
   const handleToggleUserStatus = async (userId, currentStatus) => {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
     const actionText = currentStatus === "active" ? "deactivate" : "activate";
-    
+
     if (window.confirm(`Are you sure you want to ${actionText} this user?`)) {
       try {
         const response = await axios.post(
@@ -400,11 +401,10 @@ export default function UserList({ filters }) {
           <button
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-              currentPage === 1
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-white text-gray-700 hover:bg-gray-50"
-            }`}
+            className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${currentPage === 1
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-white text-gray-700 hover:bg-gray-50"
+              }`}
           >
             Previous
           </button>
@@ -413,11 +413,10 @@ export default function UserList({ filters }) {
               setCurrentPage(Math.min(totalPages, currentPage + 1))
             }
             disabled={currentPage === totalPages}
-            className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-              currentPage === totalPages
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-white text-gray-700 hover:bg-gray-50"
-            }`}
+            className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${currentPage === totalPages
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-white text-gray-700 hover:bg-gray-50"
+              }`}
           >
             Next
           </button>
@@ -440,11 +439,10 @@ export default function UserList({ filters }) {
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
-                  currentPage === 1
-                    ? "text-gray-300 cursor-not-allowed"
-                    : "text-gray-500 hover:bg-gray-50"
-                }`}
+                className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${currentPage === 1
+                  ? "text-gray-300 cursor-not-allowed"
+                  : "text-gray-500 hover:bg-gray-50"
+                  }`}
               >
                 <span className="sr-only">Previous</span>
                 <svg
@@ -466,11 +464,10 @@ export default function UserList({ filters }) {
                 <button
                   key={index}
                   onClick={() => setCurrentPage(index + 1)}
-                  className={`relative inline-flex items-center px-4 py-2 border ${
-                    currentPage === index + 1
-                      ? "bg-blue-50 border-blue-500 text-blue-600 z-10"
-                      : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
-                  } text-sm font-medium`}
+                  className={`relative inline-flex items-center px-4 py-2 border ${currentPage === index + 1
+                    ? "bg-blue-50 border-blue-500 text-blue-600 z-10"
+                    : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                    } text-sm font-medium`}
                 >
                   {index + 1}
                 </button>
@@ -481,11 +478,10 @@ export default function UserList({ filters }) {
                   setCurrentPage(Math.min(totalPages, currentPage + 1))
                 }
                 disabled={currentPage === totalPages}
-                className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
-                  currentPage === totalPages
-                    ? "text-gray-300 cursor-not-allowed"
-                    : "text-gray-500 hover:bg-gray-50"
-                }`}
+                className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${currentPage === totalPages
+                  ? "text-gray-300 cursor-not-allowed"
+                  : "text-gray-500 hover:bg-gray-50"
+                  }`}
               >
                 <span className="sr-only">Next</span>
                 <svg

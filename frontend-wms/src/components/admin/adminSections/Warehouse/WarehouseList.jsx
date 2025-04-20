@@ -50,7 +50,7 @@ const WarehouseList = () => {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`/api/admin/${warehouseToDelete.id}`);
+      await axios.delete(`/api/admin/warehouses/${warehouseToDelete.id}`);
       setWarehouses(warehouses.filter(w => w.id !== warehouseToDelete.id));
       setIsDeleting(false);
       setWarehouseToDelete(null);

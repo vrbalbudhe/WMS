@@ -78,7 +78,7 @@ const WarehouseFieldSettings = () => {
     try {
       console.log('Deleting field with ID:', fieldToDelete.id);
       // Make sure this URL matches your backend route
-      await axios.delete(`/api/admin/fields/${fieldToDelete.id}`);
+      await axios.delete(`/api/admin/warehouses/fields/${fieldToDelete.id}`);
       setFields(fields.filter(f => f.id !== fieldToDelete.id));
       setIsDeleting(false);
       setFieldToDelete(null);
@@ -167,10 +167,10 @@ const WarehouseFieldSettings = () => {
     try {
       if (editingField) {
         // Update existing field
-        await axios.put(`/api/admin/fields/${editingField.id}`, formData);
+        await axios.put(`/api/admin/warehouses/fields/${editingField.id}`, formData);
       } else {
         // Create new field
-        await axios.post('/api/admin/fields', formData);
+        await axios.post('/api/admin/warehouses/fields', formData);
       }
 
       fetchFields();

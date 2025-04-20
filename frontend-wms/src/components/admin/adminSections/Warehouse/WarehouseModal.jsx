@@ -17,45 +17,45 @@ const WarehouseModal = ({ warehouse, onClose }) => {
   const [customFields, setCustomFields] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  
+
   useEffect(() => {
     fetchCustomFields();
-    
+
     if (warehouse) {
-        setFormData({
-          name: warehouse.name || '',
-          address: warehouse.address || '',
-          city: warehouse.city || '',
-          pincode: warehouse.pincode || '',
-          googleMapLink: warehouse.googleMapLink || '',
-          description: warehouse.description || '',
-          customFields: warehouse.customFields || {}
-        });
-      }
-    }, [warehouse]);
-  
-    const fetchCustomFields = async () => {
-        try {
-          setLoading(true);
-          // Make sure this URL matches your backend route
-          const response = await axios.get('/api/admin/fields');
-          console.log('Custom fields fetched:', response.data); // Add this for debugging
-          setCustomFields(response.data.data || []);
-          setLoading(false);
-        } catch (error) {
-          console.error('Error fetching custom fields:', error);
-          setLoading(false);
-          setCustomFields([]);
-        }
-      };
-  
+      setFormData({
+        name: warehouse.name || '',
+        address: warehouse.address || '',
+        city: warehouse.city || '',
+        pincode: warehouse.pincode || '',
+        googleMapLink: warehouse.googleMapLink || '',
+        description: warehouse.description || '',
+        customFields: warehouse.customFields || {}
+      });
+    }
+  }, [warehouse]);
+
+  const fetchCustomFields = async () => {
+    try {
+      setLoading(true);
+      // Make sure this URL matches your backend route
+      const response = await axios.get('/api/admin/warehouses/fields');
+      console.log('Custom fields fetched:', response?.data); // Add this for debugging
+      setCustomFields(response.data.data || []);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching custom fields:', error);
+      setLoading(false);
+      setCustomFields([]);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value
     });
-    
+
     // Clear error when field is edited
     if (errors[name]) {
       setErrors({
@@ -64,7 +64,7 @@ const WarehouseModal = ({ warehouse, onClose }) => {
       });
     }
   };
-  
+
   const handleCustomFieldChange = (e, field) => {
     const { value } = e.target;
     setFormData({
@@ -75,58 +75,58 @@ const WarehouseModal = ({ warehouse, onClose }) => {
       }
     });
   };
-  
+
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.name.trim()) newErrors.name = 'Name is required';
     if (!formData.address.trim()) newErrors.address = 'Address is required';
     if (!formData.city.trim()) newErrors.city = 'City is required';
     if (!formData.pincode.trim()) newErrors.pincode = 'Pincode is required';
-    
+
     // Validate custom fields that are required
     customFields.forEach(field => {
-      if (field.isRequired && 
-          (!formData.customFields[field.name] || 
-           formData.customFields[field.name].toString().trim() === '')) {
+      if (field.isRequired &&
+        (!formData.customFields[field.name] ||
+          formData.customFields[field.name].toString().trim() === '')) {
         newErrors[`custom_${field.name}`] = `${field.name} is required`;
       }
     });
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setSubmitting(true);
-    
+
     try {
-        if (warehouse) {
-          // Update existing warehouse
-          await axios.put(`/api/admin/${warehouse.id}`, formData);
-        } else {
-          // Create new warehouse
-          await axios.post('/api/admin', formData);
-        }
-        
-        setSubmitting(false);
-        onClose(true); // Close modal and refresh list
-      } catch (error) {
-        console.error('Error saving warehouse:', error);
-        setSubmitting(false);
-        
-        if (error.response && error.response.data && error.response.data.message) {
-          alert(`Error: ${error.response.data.message}`);
-        } else {
-          alert('Failed to save warehouse. Please try again.');
-        }
+      if (warehouse) {
+        // Update existing warehouse
+        await axios.put(`/api/admin/warehouses/${warehouse.id}`, formData);
+      } else {
+        // Create new warehouse
+        await axios.post('/api/admin/warehouses', formData);
       }
+
+      setSubmitting(false);
+      onClose(true); // Close modal and refresh list
+    } catch (error) {
+      console.error('Error saving warehouse:', error);
+      setSubmitting(false);
+
+      if (error.response && error.response.data && error.response.data.message) {
+        alert(`Error: ${error.response.data.message}`);
+      } else {
+        alert('Failed to save warehouse. Please try again.');
+      }
+    }
   };
-  
+
   // Render different input types based on field type
   const renderCustomField = (field) => {
     switch (field.type) {
@@ -137,9 +137,8 @@ const WarehouseModal = ({ warehouse, onClose }) => {
             id={`custom_${field.name}`}
             value={formData.customFields[field.name] || ''}
             onChange={(e) => handleCustomFieldChange(e, field)}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
-              errors[`custom_${field.name}`] ? 'border-red-500' : ''
-            }`}
+            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${errors[`custom_${field.name}`] ? 'border-red-500' : ''
+              }`}
           />
         );
       case 'number':
@@ -149,9 +148,8 @@ const WarehouseModal = ({ warehouse, onClose }) => {
             id={`custom_${field.name}`}
             value={formData.customFields[field.name] || ''}
             onChange={(e) => handleCustomFieldChange(e, field)}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
-              errors[`custom_${field.name}`] ? 'border-red-500' : ''
-            }`}
+            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${errors[`custom_${field.name}`] ? 'border-red-500' : ''
+              }`}
           />
         );
       case 'date':
@@ -161,9 +159,8 @@ const WarehouseModal = ({ warehouse, onClose }) => {
             id={`custom_${field.name}`}
             value={formData.customFields[field.name] || ''}
             onChange={(e) => handleCustomFieldChange(e, field)}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
-              errors[`custom_${field.name}`] ? 'border-red-500' : ''
-            }`}
+            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${errors[`custom_${field.name}`] ? 'border-red-500' : ''
+              }`}
           />
         );
       case 'dropdown':
@@ -172,9 +169,8 @@ const WarehouseModal = ({ warehouse, onClose }) => {
             id={`custom_${field.name}`}
             value={formData.customFields[field.name] || ''}
             onChange={(e) => handleCustomFieldChange(e, field)}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
-              errors[`custom_${field.name}`] ? 'border-red-500' : ''
-            }`}
+            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${errors[`custom_${field.name}`] ? 'border-red-500' : ''
+              }`}
           >
             <option value="">Select {field.name}</option>
             {field.options.map((option) => (
@@ -191,14 +187,13 @@ const WarehouseModal = ({ warehouse, onClose }) => {
             id={`custom_${field.name}`}
             value={formData.customFields[field.name] || ''}
             onChange={(e) => handleCustomFieldChange(e, field)}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
-              errors[`custom_${field.name}`] ? 'border-red-500' : ''
-            }`}
+            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${errors[`custom_${field.name}`] ? 'border-red-500' : ''
+              }`}
           />
         );
     }
   };
-  
+
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -213,7 +208,7 @@ const WarehouseModal = ({ warehouse, onClose }) => {
             &times;
           </button>
         </div>
-        
+
         {loading ? (
           <div className="flex justify-center items-center h-32">Loading...</div>
         ) : (
@@ -231,15 +226,14 @@ const WarehouseModal = ({ warehouse, onClose }) => {
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
-                      errors.name ? 'border-red-500' : ''
-                    }`}
+                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${errors.name ? 'border-red-500' : ''
+                      }`}
                   />
                   {errors.name && (
                     <p className="mt-1 text-sm text-red-500">{errors.name}</p>
                   )}
                 </div>
-                
+
                 <div>
                   <label htmlFor="address" className="block text-sm font-medium text-gray-700">
                     Address <span className="text-red-500">*</span>
@@ -250,16 +244,15 @@ const WarehouseModal = ({ warehouse, onClose }) => {
                     name="address"
                     value={formData.address}
                     onChange={handleInputChange}
-                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
-                      errors.address ? 'border-red-500' : ''
-                    }`}
+                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${errors.address ? 'border-red-500' : ''
+                      }`}
                   />
                   {errors.address && (
                     <p className="mt-1 text-sm text-red-500">{errors.address}</p>
                   )}
                 </div>
               </div>
-              
+
               <div className="space-y-4">
                 <div>
                   <label htmlFor="city" className="block text-sm font-medium text-gray-700">
@@ -271,15 +264,14 @@ const WarehouseModal = ({ warehouse, onClose }) => {
                     name="city"
                     value={formData.city}
                     onChange={handleInputChange}
-                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
-                      errors.city ? 'border-red-500' : ''
-                    }`}
+                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${errors.city ? 'border-red-500' : ''
+                      }`}
                   />
                   {errors.city && (
                     <p className="mt-1 text-sm text-red-500">{errors.city}</p>
                   )}
                 </div>
-                
+
                 <div>
                   <label htmlFor="pincode" className="block text-sm font-medium text-gray-700">
                     Pincode <span className="text-red-500">*</span>
@@ -290,9 +282,8 @@ const WarehouseModal = ({ warehouse, onClose }) => {
                     name="pincode"
                     value={formData.pincode}
                     onChange={handleInputChange}
-                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
-                      errors.pincode ? 'border-red-500' : ''
-                    }`}
+                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${errors.pincode ? 'border-red-500' : ''
+                      }`}
                   />
                   {errors.pincode && (
                     <p className="mt-1 text-sm text-red-500">{errors.pincode}</p>
@@ -300,7 +291,7 @@ const WarehouseModal = ({ warehouse, onClose }) => {
                 </div>
               </div>
             </div>
-            
+
             <div className="mt-6">
               <label htmlFor="googleMapLink" className="block text-sm font-medium text-gray-700">
                 Google Map Link (Optional)
@@ -314,7 +305,7 @@ const WarehouseModal = ({ warehouse, onClose }) => {
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
-            
+
             <div className="mt-6">
               <label htmlFor="description" className="block text-sm font-medium text-gray-700">
                 Description (Optional)
@@ -328,7 +319,7 @@ const WarehouseModal = ({ warehouse, onClose }) => {
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
-            
+
             {/* Custom Fields */}
             {customFields.length > 0 && (
               <div className="mt-8">
@@ -348,7 +339,7 @@ const WarehouseModal = ({ warehouse, onClose }) => {
                 </div>
               </div>
             )}
-            
+
             <div className="mt-8 flex justify-end space-x-4">
               <button
                 type="button"
