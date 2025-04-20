@@ -12,7 +12,7 @@ export const PublicLayout = () => {
       <div className="sticky top-0 z-40 w-full">
         <Navbar />
       </div>
-      <div className="w-[95%] h-full">
+      <div className="w-[100%] h-full">
         <HomepageSidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
         <Outlet />
       </div>

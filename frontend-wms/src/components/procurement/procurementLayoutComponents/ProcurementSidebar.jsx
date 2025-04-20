@@ -166,7 +166,7 @@ const ProcurementSidebar = ({ isOpen, toggleSidebar }) => {
                   : "text-gray-700 hover:bg-gray-100"
               }`}
             >
-              <Link 
+              {/* <Link 
                 to="/procurement/settings" 
                 className="flex items-center space-x-3"
                 onClick={() => handleItemClick("settings")}
@@ -179,7 +179,7 @@ const ProcurementSidebar = ({ isOpen, toggleSidebar }) => {
                   }
                 />
                 <span className="font-medium">Settings</span>
-              </Link>
+              </Link> */}
             </li>
           </ul>
 
