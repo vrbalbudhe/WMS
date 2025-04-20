@@ -1,8 +1,8 @@
 // Path: frontend-wms\src\pages\admin\ProcurementOfficerInfo.jsx
 import { useState } from "react";
-import UserList from "../../components/admin/adminSections/UserManagement/UserList";
 import { Users, PlusCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import UserList from "../../../../frontend-wms/src/components/admin/adminSections/UserManagement/UserList";
 
 export default function ProcurementOfficerInfo() {
   return (

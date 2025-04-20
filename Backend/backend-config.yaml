@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+data:
+  ADMIN_EMAIL: "admin@wms.com"
+  ADMIN_PASSWORD: "admin123"
+  PORT: "8000"
+  SITE_ADDRESS: "/api"
+  DATABASE_URL: "mongodb+srv://varunbalbudhe:8A9Gtoduc83E9PmO@cluster0.sj39b.mongodb.net/Hackathon_WCA?retryWrites=true&w=majority&appName=Cluster0"
+  JWT_SECRET_KEY: "3842irbwkjbfwu9823492y7trukwekbwieury4835y438"

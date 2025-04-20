@@ -3,7 +3,6 @@ const prisma = require("../../../lib/prisma");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const asyncHandler = require("express-async-handler");
 
 const userLogin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
