@@ -29,7 +29,7 @@ import PurchaseRequests from "./pages/procurement/PurchaseRequests";
 import VendorManagement from "./pages/procurement/VendorManagement";
 import PurchaseOrders from "./pages/procurement/PurchaseOrders";
 import ProcurementReports from "./pages/procurement/ProcurementReports";
-import ProductScanPage from "./components/WarehouseManager/Scan/ProductScanPage";
+import ProductScanPage from "./components/warehouse/AddProduct/Scan/ProductScanPage";
 
 function App() {
   const router = createBrowserRouter([
@@ -99,6 +99,10 @@ function App() {
           element: <WarehouseDashboard />,
         },
         {
+          path: "add/:warehouseId/:warehouseOfficer",
+          element: <ProductScanPage />,
+        },
+        {
           path: "inventory",
           element: <InventoryManagement />,
         },
@@ -120,10 +124,6 @@ function App() {
         {
           path: "dashboard",
           element: <ProcurementDashboard />,
-        },
-        {
-          path: "scan/:warehouseId/:warehouseOfficer",
-          element: <ProductScanPage />,
         },
         {
           path: "purchase-requests",
