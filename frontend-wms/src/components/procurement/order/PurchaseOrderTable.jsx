@@ -60,7 +60,7 @@ const PurchaseOrderTable = ({
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
       minimumFractionDigits: 0,
       maximumFractionDigits: 2
     }).format(amount);

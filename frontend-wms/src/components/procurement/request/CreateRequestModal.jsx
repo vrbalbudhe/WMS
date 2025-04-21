@@ -98,7 +98,7 @@ const CreateRequestModal = ({ departments, onSave, onClose }) => {
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
       minimumFractionDigits: 0
     }).format(amount);
   };
