@@ -1,7 +1,13 @@
-import React from 'react';
-import { FaExclamationTriangle, FaChevronRight, FaShoppingCart } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { FaExclamationTriangle, FaChevronRight, FaShoppingCart, FaPlus } from 'react-icons/fa';
+import CreateRequestModal from '../../procurement/request/CreateRequestModal';
 
 const LowStockItems = ({ items }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Mock departments data since it's required by CreateRequestModal
+  const departments = ['IT', 'Finance', 'HR', 'Operations', 'Marketing', 'Sales'];
+  
   // Calculate percentage of stock remaining for progress bar
   const calculatePercentage = (current, min) => {
     const percentage = (current / min) * 100;
@@ -16,6 +22,23 @@ const LowStockItems = ({ items }) => {
     return 'bg-green-500';
   };
 
+  // Open modal handler
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  // Close modal handler
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+  
+  // Handle save from modal
+  const handleSaveRequest = (requestData) => {
+    // Implement save logic here
+    console.log('Request saved:', requestData);
+    closeModal();
+  };
+
   return (
     <div className="bg-white rounded-lg shadow">
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
@@ -23,9 +46,17 @@ const LowStockItems = ({ items }) => {
           <FaExclamationTriangle className="text-yellow-500 mr-2" size={18} />
           <h2 className="text-lg font-semibold text-gray-700">Low Stock Items</h2>
         </div>
-        <button className="text-purple-600 flex items-center text-sm hover:underline">
-          View All <FaChevronRight className="ml-1" size={12} />
-        </button>
+        <div className="flex items-center space-x-4">
+          <button 
+            onClick={openModal}
+            className="text-white bg-purple-600 hover:bg-purple-700 px-3 py-1 rounded-md text-sm flex items-center"
+          >
+            <FaPlus className="mr-1" size={12} /> Create Request
+          </button>
+          <button className="text-purple-600 flex items-center text-sm hover:underline">
+            View All <FaChevronRight className="ml-1" size={12} />
+          </button>
+        </div>
       </div>
       
       <div className="p-4">
@@ -67,6 +98,15 @@ const LowStockItems = ({ items }) => {
           </div>
         )}
       </div>
+      
+      {/* Create Request Modal */}
+      {isModalOpen && (
+        <CreateRequestModal
+          departments={departments}
+          onSave={handleSaveRequest}
+          onClose={closeModal}
+        />
+      )}
     </div>
   );
 };

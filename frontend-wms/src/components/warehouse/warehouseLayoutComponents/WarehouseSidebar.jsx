@@ -1,3 +1,4 @@
+import { FactoryIcon } from "lucide-react";
 import React, { useState } from "react";
 import {
   FaBoxOpen,
@@ -153,20 +154,20 @@ const WarehouseSidebar = ({ isOpen, toggleSidebar }) => {
                   : "text-gray-700 hover:bg-gray-100"
               }`}
             >
-              {/* <Link 
-                to="/warehouse/settings" 
+              <Link 
+                to="/warehouse/request" 
                 className="flex items-center space-x-3 w-full"
-                onClick={() => handleItemClick("settings", "/warehouse/settings")}
+                onClick={() => handleItemClick("request", "/warehouse/request")}
               >
-                <FaCog
+                <FaBars
                   className={
-                    activeItem === "settings"
+                    activeItem === "request"
                       ? "text-blue-600"
                       : "text-gray-500"
                   }
                 />
-                <span className="font-medium">Settings</span>
-              </Link> */}
+                <span className="font-medium">Shipment Request</span>
+              </Link>
             </li>
           </ul>
 
