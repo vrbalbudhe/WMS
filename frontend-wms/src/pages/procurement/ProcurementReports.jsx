@@ -190,10 +190,10 @@ const ProcurementReports = () => {
       key: 'total_amount',
       sorter: (a, b) => a.total_amount - b.total_amount,
       render: (value) => (
-        <Tooltip title={`$${value.toLocaleString()}`}>
+        <Tooltip title={`₹${value.toLocaleString()}`}>
           <span className="font-medium">
-            <DollarOutlined className="mr-1 text-green-600" />
-            ${value.toLocaleString()}
+            {/* <DollarOutlined className="mr-1 text-green-600" /> */}
+            ₹{value.toLocaleString()}
           </span>
         </Tooltip>
       )
@@ -317,7 +317,7 @@ const ProcurementReports = () => {
             title={<Text strong>Total Spend</Text>}
             value={stats.totalSpend}
             precision={2}
-            prefix="$"
+            prefix="₹"
             valueStyle={{ color: '#3f8600' }}
           />
         </Card>
@@ -328,7 +328,7 @@ const ProcurementReports = () => {
             title={<Text strong>Average Order Value</Text>}
             value={stats.avgOrderValue}
             precision={2}
-            prefix="$"
+            prefix="₹"
             valueStyle={{ color: '#722ed1' }}
           />
         </Card>
@@ -431,7 +431,7 @@ const ProcurementReports = () => {
               return (
                 <Table.Summary.Row className="bg-gray-100 font-medium">
                   <Table.Summary.Cell index={0} colSpan={3}>Page Total:</Table.Summary.Cell>
-                  <Table.Summary.Cell index={3}>${totalAmount.toLocaleString()}</Table.Summary.Cell>
+                  <Table.Summary.Cell index={3}>₹{totalAmount.toLocaleString()}</Table.Summary.Cell>
                   <Table.Summary.Cell index={4}>{totalItems}</Table.Summary.Cell>
                   <Table.Summary.Cell index={5} colSpan={3}></Table.Summary.Cell>
                 </Table.Summary.Row>
