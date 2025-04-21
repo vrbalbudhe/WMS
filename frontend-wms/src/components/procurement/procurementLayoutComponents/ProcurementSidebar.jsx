@@ -90,7 +90,7 @@ const ProcurementSidebar = ({ isOpen, toggleSidebar }) => {
               </Link>
             </li>
 
-            <li
+            {/* <li
               className={`flex items-center space-x-3 py-3 px-4 rounded-lg cursor-pointer transition-colors duration-200 ${
                 activeItem === "vendors"
                   ? "bg-blue-50 text-blue-600"
@@ -111,7 +111,7 @@ const ProcurementSidebar = ({ isOpen, toggleSidebar }) => {
                 />
                 <span className="font-medium">Vendor Management</span>
               </Link>
-            </li>
+            </li> */}
 
             <li
               className={`flex items-center space-x-3 py-3 px-4 rounded-lg cursor-pointer transition-colors duration-200 ${

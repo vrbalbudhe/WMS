@@ -10,12 +10,14 @@ import {
   FaEdit,
   FaTrash,
   FaEye,
-  FaHistory
+  FaHistory,
+  FaBarcode
 } from 'react-icons/fa';
 import InventoryFilters from '../../components/warehouse/inventory/InventoryFilters';
 import InventoryTable from '../../components/warehouse/inventory/InventoryTable';
 import ItemDetailsModal from '../../components/warehouse/inventory/ItemDetailsModal';
 import AddEditItemModal from '../../components/warehouse/inventory/AddEditItemModal';
+import ScanItemModal from '../../components/warehouse/inventory/ScanItemModal';
 
 const InventoryManagement = () => {
   // State for inventory items (in a real app, this would come from an API)
@@ -24,7 +26,7 @@ const InventoryManagement = () => {
       id: 'ITM-2057', 
       name: 'Office Chair - Ergonomic', 
       category: 'Furniture',
-      location: 'Warehouse A, Shelf 5',
+      location: 'Shelf 5',
       quantity: 15,
       minStock: 10,
       supplier: 'Office Furnish Co.',
@@ -35,7 +37,7 @@ const InventoryManagement = () => {
       id: 'ITM-1867', 
       name: 'Printer Toner - Black', 
       category: 'Office Supplies',
-      location: 'Warehouse B, Shelf 2',
+      location: 'Shelf 2',
       quantity: 3,
       minStock: 15,
       supplier: 'Tech Supplies Inc.',
@@ -46,7 +48,7 @@ const InventoryManagement = () => {
       id: 'ITM-1942', 
       name: 'Desktop Computer - Model X', 
       category: 'Electronics',
-      location: 'Warehouse A, Shelf 10',
+      location: 'Shelf 10',
       quantity: 8,
       minStock: 5,
       supplier: 'Tech Supplies Inc.',
@@ -57,7 +59,7 @@ const InventoryManagement = () => {
       id: 'ITM-2103', 
       name: 'First Aid Kit', 
       category: 'Safety',
-      location: 'Warehouse A, Shelf 1',
+      location: 'Shelf 1',
       quantity: 1,
       minStock: 8,
       supplier: 'Safety First Ltd.',
@@ -68,7 +70,7 @@ const InventoryManagement = () => {
       id: 'ITM-1756', 
       name: 'Paper - A4', 
       category: 'Office Supplies',
-      location: 'Warehouse B, Shelf 3',
+      location: 'Shelf 3',
       quantity: 0,
       minStock: 20,
       supplier: 'Paper Supplies Co.',
@@ -79,7 +81,7 @@ const InventoryManagement = () => {
       id: 'ITM-2104', 
       name: 'Projector - HD', 
       category: 'Electronics',
-      location: 'Warehouse A, Shelf 7',
+      location: 'Shelf 7',
       quantity: 5,
       minStock: 3,
       supplier: 'Tech Supplies Inc.',
@@ -90,7 +92,7 @@ const InventoryManagement = () => {
       id: 'ITM-1893', 
       name: 'Conference Table', 
       category: 'Furniture',
-      location: 'Warehouse C, Floor Area',
+      location: 'Floor Area',
       quantity: 2,
       minStock: 1,
       supplier: 'Office Furnish Co.',
@@ -101,7 +103,7 @@ const InventoryManagement = () => {
       id: 'ITM-2035', 
       name: 'Whiteboard - Large', 
       category: 'Office Equipment',
-      location: 'Warehouse C, Wall Storage',
+      location: 'Wall Storage',
       quantity: 4,
       minStock: 2,
       supplier: 'Office Furnish Co.',
@@ -134,6 +136,9 @@ const InventoryManagement = () => {
   // State for adding/editing item modal
   const [showAddEditModal, setShowAddEditModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  
+  // State for scanning modal
+  const [showScanModal, setShowScanModal] = useState(false);
   
   // Handle item view
   const handleViewItem = (item) => {
@@ -177,6 +182,40 @@ const InventoryManagement = () => {
     if (window.confirm('Are you sure you want to delete this item?')) {
       setInventoryItems(prevItems => prevItems.filter(item => item.id !== id));
     }
+  };
+  
+  // Handle scan item
+  const handleScanItem = () => {
+    setShowScanModal(true);
+  };
+  
+  // Handle a scanned item code
+  const handleScannedItem = (itemCode) => {
+    // Check if item exists
+    const existingItem = inventoryItems.find(item => item.id === itemCode);
+    
+    if (existingItem) {
+      // If item exists, show details or edit
+      setSelectedItem(existingItem);
+      setShowItemDetails(true);
+    } else {
+      // If item doesn't exist, create new item with the scanned code
+      setEditingItem({
+        id: itemCode,
+        name: '',
+        category: '',
+        location: '',
+        quantity: 0,
+        minStock: 0,
+        supplier: '',
+        lastUpdated: new Date().toISOString().split('T')[0],
+        status: 'In Stock'
+      });
+      setShowAddEditModal(true);
+    }
+    
+    // Close the scan modal
+    setShowScanModal(false);
   };
   
   // Get all unique categories, statuses, and suppliers for filters
@@ -243,6 +282,13 @@ const InventoryManagement = () => {
         <div className="flex justify-between items-center flex-wrap gap-4">
           <h1 className="text-2xl font-bold text-gray-800">Inventory Management</h1>
           <div className="flex space-x-2">
+            <button 
+              onClick={handleScanItem}
+              className="flex items-center text-white bg-purple-600 hover:bg-purple-700 py-2 px-4 rounded-lg"
+            >
+              <FaBarcode className="mr-2" />
+              Scan Item
+            </button>
             <button 
               onClick={handleAddNewItem}
               className="flex items-center text-white bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-lg"
@@ -393,6 +439,14 @@ const InventoryManagement = () => {
             suppliers={suppliers}
             onSave={handleSaveItem}
             onClose={() => setShowAddEditModal(false)}
+          />
+        )}
+        
+        {/* Scan item modal */}
+        {showScanModal && (
+          <ScanItemModal 
+            onClose={() => setShowScanModal(false)}
+            onItemDetected={handleScannedItem}
           />
         )}
       </div>

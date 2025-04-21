@@ -245,13 +245,13 @@ const PurchaseRequests = () => {
         <div className="flex justify-between items-center flex-wrap gap-4">
           <h1 className="text-2xl font-bold text-gray-800">Purchase Requests</h1>
           <div className="flex space-x-2">
-            <button 
+            {/* <button 
               onClick={handleCreateRequest}
               className="flex items-center text-white bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-lg"
             >
               <FaPlus className="mr-2" />
               New Request
-            </button>
+            </button> */}
             <button 
               onClick={handleExport}
               className="flex items-center text-white bg-gray-600 hover:bg-gray-700 py-2 px-4 rounded-lg"

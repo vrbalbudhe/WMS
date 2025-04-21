@@ -194,7 +194,7 @@ const ProcurementDashboard = () => {
         </div>
         
         {/* Summary Cards Row 2 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <SummaryCard 
             title={`Total Spend (${timePeriod})`}
             value={summaryData.totalSpend}
@@ -221,7 +221,7 @@ const ProcurementDashboard = () => {
             isCurrency={true}
             trend="+5%"
           />
-        </div>
+        </div> */}
         
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

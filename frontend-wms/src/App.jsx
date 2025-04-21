@@ -22,6 +22,7 @@ import WarehouseDashboard from "./pages/warehouse/WarehouseDashboard";
 import InventoryManagement from "./pages/warehouse/InventoryManagement";
 import ShipmentTracking from "./pages/warehouse/ShipmentTracking";
 import StockReports from "./pages/warehouse/StockReports";
+import WarehouseRequestsDashboard from "./pages/warehouse/WarehouseRequestsDashboard"
 // Procurement Officer
 import { ProcurementLayout } from "./layouts/ProcurementLayout";
 import ProcurementDashboard from "./pages/procurement/ProcurementDashboard";
@@ -109,6 +110,10 @@ function App() {
           path: "reports",
           element: <StockReports />,
         },
+        {
+          path: "request",
+          element: <WarehouseRequestsDashboard />
+        }
       ],
     },
     // New routes for procurement officer
