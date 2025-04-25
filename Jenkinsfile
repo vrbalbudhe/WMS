@@ -2,28 +2,28 @@ pipeline {
     agent any
 
     environment {
-        FRONTEND_PORT = 5173
-        BACKEND_PORT = 8000
-        FRONTEND_IMAGE = 'frontend-image'
-        BACKEND_IMAGE = 'backend-image'
-        REGISTRY = 'https://index.docker.io/v1/'
-        REGISTRY_CREDENTIALS = 'dockerhub-credentials'
+        DOCKER_IMAGE_FRONTEND = "frontend-image"
+        DOCKER_IMAGE_BACKEND = "backend-image"
     }
 
     stages {
-        stage('Checkout') {
+        stage('Checkout SCM') {
             steps {
-                // Checkout the code from GitHub
-                git branch: 'varun', url: 'https://github.com/vrbalbudhe/WMS.git'
+                script {
+                    // Checkout the Git repository
+                    checkout scm
+                }
             }
         }
 
         stage('Build Backend') {
             steps {
-                // Navigate to the backend directory and build the Docker image
-                dir('backend') {
-                    script {
-                        docker.build(BACKEND_IMAGE, '.')
+                script {
+                    // Navigate to the backend directory and build Docker image
+                    dir('backend') {
+                        bat '''
+                            docker build -t %DOCKER_IMAGE_BACKEND% .
+                        '''
                     }
                 }
             }
@@ -31,10 +31,12 @@ pipeline {
 
         stage('Build Frontend') {
             steps {
-                // Navigate to the frontend directory and build the Docker image
-                dir('frontend') {
-                    script {
-                        docker.build(FRONTEND_IMAGE, '.')
+                script {
+                    // Navigate to the frontend directory and build Docker image
+                    dir('frontend') {
+                        bat '''
+                            docker build -t %DOCKER_IMAGE_FRONTEND% .
+                        '''
                     }
                 }
             }
@@ -42,38 +44,46 @@ pipeline {
 
         stage('Run Backend') {
             steps {
-                // Run backend container
                 script {
-                    docker.image(BACKEND_IMAGE).run("-d -p ${BACKEND_PORT}:8000")
+                    // Run the backend Docker container
+                    bat '''
+                        docker run -d --name backend-container %DOCKER_IMAGE_BACKEND%
+                    '''
                 }
             }
         }
 
         stage('Run Frontend') {
             steps {
-                // Run frontend container
                 script {
-                    docker.image(FRONTEND_IMAGE).run("-d -p ${FRONTEND_PORT}:3000")
+                    // Run the frontend Docker container
+                    bat '''
+                        docker run -d --name frontend-container %DOCKER_IMAGE_FRONTEND%
+                    '''
                 }
             }
         }
 
         stage('Test Backend') {
             steps {
-                // Example of running backend tests (adjust with your test framework)
                 script {
-                    // For example, using `curl` or testing the API with Postman
-                    sh "curl http://localhost:${BACKEND_PORT}/health"
+                    // You can add backend test scripts here
+                    bat '''
+                        echo "Running Backend Tests"
+                        // Add test commands for backend
+                    '''
                 }
             }
         }
 
         stage('Test Frontend') {
             steps {
-                // Example of running frontend tests (adjust with your test framework)
                 script {
-                    // Test frontend using a tool like Cypress or Jest
-                    sh "curl http://localhost:${FRONTEND_PORT}/"
+                    // You can add frontend test scripts here
+                    bat '''
+                        echo "Running Frontend Tests"
+                        // Add test commands for frontend
+                    '''
                 }
             }
         }
@@ -81,37 +91,38 @@ pipeline {
         stage('Push Docker Images') {
             steps {
                 script {
-                    // Push both frontend and backend images to Docker Hub (or any registry)
-                    docker.withRegistry(REGISTRY, REGISTRY_CREDENTIALS) {
-                        docker.image(FRONTEND_IMAGE).push('latest')
-                        docker.image(BACKEND_IMAGE).push('latest')
-                    }
+                    // Push the Docker images to Docker Hub or your container registry
+                    bat '''
+                        docker push %DOCKER_IMAGE_BACKEND%
+                        docker push %DOCKER_IMAGE_FRONTEND%
+                    '''
                 }
             }
         }
 
         stage('Deploy') {
             steps {
-                // Deploy your containers to a server, ECS, Kubernetes, etc.
-                // Example: Using ECS or other cloud services
-                echo 'Deploying to production (or test) environment'
+                script {
+                    // Add your deployment steps here (e.g., AWS ECS, Kubernetes)
+                    echo "Deploying application..."
+                }
             }
         }
     }
 
     post {
         always {
-            // Clean up resources or notify team (optional)
-            echo 'Cleaning up resources or notifying team'
+            echo 'Cleaning up resources'
+            // Clean up any resources (e.g., remove Docker containers)
+            bat '''
+                docker rm -f frontend-container
+                docker rm -f backend-container
+            '''
         }
-
         success {
-            // Notify success (optional)
-            echo 'Pipeline executed successfully!'
+            echo 'Pipeline succeeded!'
         }
-
         failure {
-            // Notify failure (optional)
             echo 'Pipeline failed!'
         }
     }
