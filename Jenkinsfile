@@ -10,7 +10,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout the code from GitHub
-                git 'https://github.com/vrbalbudhe/WMS.git'
+                git branch: 'varun', url: 'https://github.com/vrbalbudhe/WMS.git'
             }
         }
 
