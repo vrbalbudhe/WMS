@@ -1,3 +1,3 @@
 # WMS
 This is the SE Project Repo for building the Warehouse Management System
-check 1
+check 1 2
