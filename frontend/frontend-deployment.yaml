@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: varun029/wms_frontend:01
+          image: varun029/wms_frontend:05
           ports:
             - containerPort: 5173
           envFrom:
@@ -32,4 +32,4 @@ spec:
     - protocol: TCP
       port: 5173
       targetPort: 5173
-  type: LoadBalancer
+  type: NodePort

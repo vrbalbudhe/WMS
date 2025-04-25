@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: varun029/wms_backend:01
+          image: varun029/wms_backend:02
           ports:
             - containerPort: 8000
           envFrom:

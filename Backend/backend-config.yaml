@@ -9,3 +9,5 @@ data:
   SITE_ADDRESS: "/api"
   DATABASE_URL: "mongodb+srv://varunbalbudhe:8A9Gtoduc83E9PmO@cluster0.sj39b.mongodb.net/Hackathon_WCA?retryWrites=true&w=majority&appName=Cluster0"
   JWT_SECRET_KEY: "3842irbwkjbfwu9823492y7trukwekbwieury4835y438"
+  EMAIL_USER: "privatetest963@gmail.com"
+  EMAIL_PASS: "uxbx zchd rewx qwcr"
