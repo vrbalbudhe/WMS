@@ -62,11 +62,11 @@ pipeline {
                 echo Logging into Docker Hub
                 echo %DOCKERHUB_CREDENTIALS_PSW% | docker login -u %DOCKERHUB_CREDENTIALS_USR% --password-stdin
 
-                docker tag backend-image vrbalbudhe/backend-image
-                docker tag frontend-image vrbalbudhe/frontend-image
+                docker tag backend-image varun029/backend-image
+                docker tag frontend-image varun029/frontend-image
 
-                docker push vrbalbudhe/backend-image
-                docker push vrbalbudhe/frontend-image
+                docker push varun029/backend-image
+                docker push varun029/frontend-image
                 '''
             }
         }
