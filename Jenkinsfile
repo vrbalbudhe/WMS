@@ -74,9 +74,12 @@ pipeline {
         stage('Deploy') {
             steps {
                 bat '''
-                echo Deploying Application
-                REM Add deployment commands here
-                '''
+        docker pull varun029/backend-image
+        docker pull varun029/frontend-image
+
+        docker run -d --name backend -p 8000:8000 varun029/backend-image
+        docker run -d --name frontend -p 5173:5173 varun029/frontend-image
+        '''
             }
         }
     }
