@@ -1,12 +1,12 @@
 pipeline {
     agent any
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
+        DOCKERHUB_CREDENTIALS = credentials('dock-creds')
     }
     stages {
         stage('Checkout SCM') {
             steps {
-                checkout scm
+                git 'https://github.com/vrbalbudhe/WMS.git'
             }
         }
 
