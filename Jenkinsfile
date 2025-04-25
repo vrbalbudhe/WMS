@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('Checkout SCM') {
             steps {
-                git 'https://github.com/vrbalbudhe/WMS.git'
+                  git branch: 'varun', url: 'https://github.com/vrbalbudhe/WMS.git'
             }
         }
 
