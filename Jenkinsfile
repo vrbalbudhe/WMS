@@ -1,111 +1,82 @@
 pipeline {
     agent any
-
     environment {
-        DOCKER_IMAGE_FRONTEND = "frontend-image"
-        DOCKER_IMAGE_BACKEND = "backend-image"
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
     }
-
     stages {
         stage('Checkout SCM') {
             steps {
-                script {
-                    // Checkout the Git repository
-                    checkout scm
-                }
+                checkout scm
             }
         }
 
         stage('Build Backend') {
             steps {
-                script {
-                    // Navigate to the backend directory and build Docker image
-                    dir('backend') {
-                        bat '''
-                            docker build -t %DOCKER_IMAGE_BACKEND% .
-                        '''
-                    }
+                dir('backend') {
+                    bat 'docker build -t backend-image .'
                 }
             }
         }
 
         stage('Build Frontend') {
             steps {
-                script {
-                    // Navigate to the frontend directory and build Docker image
-                    dir('frontend') {
-                        bat '''
-                            docker build -t %DOCKER_IMAGE_FRONTEND% .
-                        '''
-                    }
+                dir('frontend') {
+                    bat 'docker build -t frontend-image .'
                 }
             }
         }
 
         stage('Run Backend') {
             steps {
-                script {
-                    // Run the backend Docker container
-                    bat '''
-                        docker run -d --name backend-container %DOCKER_IMAGE_BACKEND%
-                    '''
-                }
+                bat 'docker run -d --name backend-container backend-image'
             }
         }
 
         stage('Run Frontend') {
             steps {
-                script {
-                    // Run the frontend Docker container
-                    bat '''
-                        docker run -d --name frontend-container %DOCKER_IMAGE_FRONTEND%
-                    '''
-                }
+                bat 'docker run -d --name frontend-container frontend-image'
             }
         }
 
         stage('Test Backend') {
             steps {
-                script {
-                    // You can add backend test scripts here
-                    bat '''
-                        echo "Running Backend Tests"
-                        // Add test commands for backend
-                    '''
-                }
+                bat '''
+                echo Running Backend Tests
+                REM Replace with actual backend test command
+                '''
             }
         }
 
         stage('Test Frontend') {
             steps {
-                script {
-                    // You can add frontend test scripts here
-                    bat '''
-                        echo "Running Frontend Tests"
-                        // Add test commands for frontend
-                    '''
-                }
+                bat '''
+                echo Running Frontend Tests
+                REM Replace with actual frontend test command
+                '''
             }
         }
 
         stage('Push Docker Images') {
             steps {
-                script {
-                    // Push the Docker images to Docker Hub or your container registry
-                    bat '''
-                        docker push %DOCKER_IMAGE_BACKEND%
-                        docker push %DOCKER_IMAGE_FRONTEND%
-                    '''
-                }
+                bat '''
+                echo Logging into Docker Hub
+                echo %DOCKERHUB_CREDENTIALS_PSW% | docker login -u %DOCKERHUB_CREDENTIALS_USR% --password-stdin
+
+                docker tag backend-image vrbalbudhe/backend-image
+                docker tag frontend-image vrbalbudhe/frontend-image
+
+                docker push vrbalbudhe/backend-image
+                docker push vrbalbudhe/frontend-image
+                '''
             }
         }
 
         stage('Deploy') {
             steps {
-                script {
-                    // Add your deployment steps here (e.g., AWS ECS, Kubernetes)
-                    echo "Deploying application..."
-                }
+                bat '''
+                echo Deploying Application
+                REM Add deployment commands here
+                '''
             }
         }
     }
@@ -113,17 +84,16 @@ pipeline {
     post {
         always {
             echo 'Cleaning up resources'
-            // Clean up any resources (e.g., remove Docker containers)
-            bat '''
-                docker rm -f frontend-container
-                docker rm -f backend-container
-            '''
+            bat 'docker rm -f frontend-container || echo Frontend container already removed'
+            bat 'docker rm -f backend-container || echo Backend container already removed'
         }
-        success {
-            echo 'Pipeline succeeded!'
-        }
+
         failure {
             echo 'Pipeline failed!'
+        }
+
+        success {
+            echo 'Pipeline completed successfully!'
         }
     }
 }
