@@ -12,7 +12,7 @@ services:
 
   frontend:
     build:
-      context: ./frontend
+      context: ./frontend-wms
       dockerfile: Dockerfile
     container_name: frontend
     ports:
