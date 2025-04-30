@@ -74,19 +74,18 @@ pipeline {
             }
         }
     }
-    post {
-        always {
-            node {
-                echo 'Cleaning up resources'
-                sh 'docker rm -f frontend-container || echo "Frontend container already removed"'
-                sh 'docker rm -f backend-container || echo "Backend container already removed"'
-            }
-        }
-        failure {
-            echo 'Pipeline failed!'
-        }
-        success {
-            echo 'Pipeline completed successfully!'
-        }
+   post {
+    always {
+        echo 'Cleaning up resources'
+        sh 'docker rm -f frontend-container || echo "Frontend container already removed"'
+        sh 'docker rm -f backend-container || echo "Backend container already removed"'
     }
+    failure {
+        echo 'Pipeline failed!'
+    }
+    success {
+        echo 'Pipeline completed successfully!'
+    }
+}
+
 }
