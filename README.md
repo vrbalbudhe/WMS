@@ -4,4 +4,4 @@ check 1 2 3 4 5 10
 checking the configuration
 2d
 l
-w
+wd
