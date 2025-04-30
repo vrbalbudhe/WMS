@@ -8,18 +8,19 @@ import axios from "axios";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { currentUser, refreshLoginContext, setLoading } = useContext(AuthContext);
+  const { currentUser, refreshLoginContext, setLoading } =
+    useContext(AuthContext);
   const navigate = useNavigate();
-  
+
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
-  
+
   const handleLogout = async () => {
     try {
       console.log("Logging out from sidebar");
       setLoading(true);
-      
+
       const response = await axios.post(
         "http://localhost:8000/api/auth/logout",
         {},
@@ -27,10 +28,10 @@ const Sidebar = () => {
       );
 
       console.log("Logout response:", response.data);
-      
+
       // Even if the response has an error, we'll still clear local state
       await refreshLoginContext();
-      
+
       // Navigate to home page
       navigate("/");
     } catch (err) {
@@ -90,7 +91,7 @@ const Sidebar = () => {
             </Link>
           </li>
           <li>
-            <button 
+            <button
               onClick={handleLogout}
               className="flex w-full items-center gap-3 p-3 hover:bg-red-600 transition"
             >

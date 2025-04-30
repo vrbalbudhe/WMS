@@ -1,8 +1,8 @@
 // Backend\controllers\users\users_auth_controllers\login.js
 const prisma = require("../../../lib/prisma");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const userLogin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;

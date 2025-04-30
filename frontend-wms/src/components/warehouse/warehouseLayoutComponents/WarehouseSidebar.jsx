@@ -1,5 +1,4 @@
-import { FactoryIcon } from "lucide-react";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   FaBoxOpen,
   FaTruck,
@@ -11,25 +10,25 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../../../contexts/AuthContext";
 
 const WarehouseSidebar = ({ isOpen, toggleSidebar }) => {
+  const { currentUser } = useContext(AuthContext);
   const [activeItem, setActiveItem] = useState("dashboard");
-
   const handleItemClick = (item) => {
     setActiveItem(item);
   };
+  console.log(" - -- - -???", currentUser);
 
   return (
     <div className="relative">
-      {/* Mobile sidebar toggle button */}
       <button
         onClick={toggleSidebar}
         className="fixed z-30 top-4 left-4 p-3 rounded-full bg-blue-600 text-white shadow-md hover:bg-blue-700 transition-colors duration-200 lg:hidden"
       >
         {isOpen ? <FaTimes /> : <FaBars />}
       </button>
-      
-      {/* Collapsed sidebar toggle button (visible when sidebar is hidden) */}
+
       {!isOpen && (
         <button
           onClick={toggleSidebar}
@@ -67,7 +66,9 @@ const WarehouseSidebar = ({ isOpen, toggleSidebar }) => {
               <Link
                 to="/warehouse/dashboard"
                 className="flex items-center space-x-3 w-full"
-                onClick={() => handleItemClick("dashboard", "/warehouse/dashboard")}
+                onClick={() =>
+                  handleItemClick("dashboard", "/warehouse/dashboard")
+                }
               >
                 <FaChartBar
                   className={
@@ -77,6 +78,30 @@ const WarehouseSidebar = ({ isOpen, toggleSidebar }) => {
                   }
                 />
                 <span className="font-medium">Dashboard</span>
+              </Link>
+            </li>
+            <li
+              className={`flex items-center space-x-3 py-3 px-4 rounded-lg cursor-pointer transition-colors duration-200 ${
+                activeItem === "dashboard"
+                  ? "bg-blue-50 text-blue-600"
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              <Link
+                to={`/warehouse/add/${currentUser?.warehouseId}/${currentUser?.id}`}
+                className="flex items-center space-x-3 w-full"
+                onClick={() =>
+                  handleItemClick("dashboard", "/warehouse/dashboard")
+                }
+              >
+                <FaChartBar
+                  className={
+                    activeItem === "dashboard"
+                      ? "text-blue-600"
+                      : "text-gray-500"
+                  }
+                />
+                <span className="font-medium">Add Product</span>
               </Link>
             </li>
 
@@ -90,11 +115,15 @@ const WarehouseSidebar = ({ isOpen, toggleSidebar }) => {
               <Link
                 to="/warehouse/inventory"
                 className="flex items-center space-x-3 w-full"
-                onClick={() => handleItemClick("inventory", "/warehouse/inventory")}
+                onClick={() =>
+                  handleItemClick("inventory", "/warehouse/inventory")
+                }
               >
                 <FaBoxOpen
                   className={
-                    activeItem === "inventory" ? "text-blue-600" : "text-gray-500"
+                    activeItem === "inventory"
+                      ? "text-blue-600"
+                      : "text-gray-500"
                   }
                 />
                 <span className="font-medium">Inventory Management</span>
@@ -111,7 +140,9 @@ const WarehouseSidebar = ({ isOpen, toggleSidebar }) => {
               <Link
                 to="/warehouse/shipments"
                 className="flex items-center space-x-3 w-full"
-                onClick={() => handleItemClick("shipments", "/warehouse/shipments")}
+                onClick={() =>
+                  handleItemClick("shipments", "/warehouse/shipments")
+                }
               >
                 <FaTruck
                   className={
@@ -138,9 +169,7 @@ const WarehouseSidebar = ({ isOpen, toggleSidebar }) => {
               >
                 <FaClipboardList
                   className={
-                    activeItem === "reports"
-                      ? "text-blue-600"
-                      : "text-gray-500"
+                    activeItem === "reports" ? "text-blue-600" : "text-gray-500"
                   }
                 />
                 <span className="font-medium">Stock Reports</span>

@@ -1,7 +1,7 @@
 // Path: Backend\controllers\admin\admin_users_controllers\resetPassword.js
 const asyncHandler = require("express-async-handler");
 const prisma = require("../../../lib/prisma");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 

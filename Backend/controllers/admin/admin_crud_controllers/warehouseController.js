@@ -1,8 +1,6 @@
 // Path: Backend/controllers/admin/admin_crud_controllers/warehouseController.js
 
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
-
+const prisma = require("../../../lib/prisma");
 // Create a new warehouse
 exports.createWarehouse = async (req, res) => {
   try {

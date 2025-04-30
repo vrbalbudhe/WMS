@@ -44,7 +44,7 @@ const StockReports = () => {
   // Sample data for category distribution
   const categoryDistribution = [
     { name: 'Office Supplies', value: 450, percentage: 31.6 },
-    { name: 'Electronics', value: 325, value: 22.8 },
+    { name: 'Electronics', value: 325, percentage: 22.8 },
     { name: 'Furniture', value: 280, percentage: 19.6 },
     { name: 'Safety Equipment', value: 201, percentage: 14.1 },
     { name: 'Others', value: 170, percentage: 11.9 }

@@ -2,7 +2,7 @@
 const express = require("express");
 const { login } = require("../../controllers/admin/admin_auth_controllers/login");
 const { register } = require("../../controllers/admin/admin_auth_controllers/register");
-const { OtherUsersRegister } = require("../../controllers/admin/admin_users_controllers/register");
+const { OtherUsersRegister } = require("../../controllers/admin/admin_users_controllers/registeer");
 const only_admin_role = require("../../middlewares/only_admin_role");
 // Check this import - make sure the function name matches what's exported
 const { sendUserCredentials } = require("../../controllers/admin/admin_users_controllers/email_credintials");

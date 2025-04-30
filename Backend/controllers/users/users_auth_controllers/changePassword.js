@@ -1,6 +1,6 @@
 // Backend\controllers\users\users_auth_controllers\changePassword.js
 const prisma = require("../../../lib/prisma");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const asyncHandler = require("express-async-handler");
 
 const changePassword = asyncHandler(async (req, res) => {

@@ -1,0 +1,23 @@
+services:
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - Backend/.env
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend-wms
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "5173:5173"
+    working_dir: /app
+    depends_on:
+      - backend
+    restart: always

@@ -1,8 +1,8 @@
 // Path: frontend-wms\src\pages\admin\WarehouseOfficerInfo.jsx
 import { useState } from "react";
-import UserList from "../../components/admin/adminSections/UserManagement/UserList";
 import { Warehouse, PlusCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import UserList from "../../components/admin/adminSections/UserManagement/UserList";
 
 export default function WarehouseOfficerInfo() {
   return (
