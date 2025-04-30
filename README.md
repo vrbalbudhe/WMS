@@ -1,4 +1,4 @@
 # WMS
 
 #### made a bash file
-- dnsdsdlll
+- dnsdsdllldfsf smndf sdf
