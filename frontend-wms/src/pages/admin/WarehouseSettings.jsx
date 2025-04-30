@@ -1,7 +1,7 @@
 // Path: frontend-wms/src/pages/admin/WarehouseSettings.jsx
 
 import React from 'react';
-// import WarehouseFieldSettings from '../../components/admin/adminSections/Warehouse/WarehouseFieldSettings';
+import WarehouseFieldSettings from '../../components/admin/adminSections/Warehouse/WarehouseFieldSettings';
 
 const WarehouseSettings = () => {
   return (
