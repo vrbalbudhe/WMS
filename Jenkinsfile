@@ -76,21 +76,15 @@ pipeline {
      }
      post {
           always {
-               node {  // Added node block
-                    echo 'Cleaning up resources'
-                    sh 'docker rm -f frontend-container || echo Frontend container already removed'
-                    sh 'docker rm -f backend-container || echo Backend container already removed'
-               }
+               echo 'Cleaning up resources'
+               sh 'docker rm -f frontend-container || echo "Frontend container already removed"'
+               sh 'docker rm -f backend-container || echo "Backend container already removed"'
           }
           failure {
-               node {  // Added node block
-                    echo 'Pipeline failed!'
-               }
+               echo 'Pipeline failed!'
           }
           success {
-               node {  // Added node block
-                    echo 'Pipeline completed successfully!'
-               }
+               echo 'Pipeline completed successfully!'
           }
      }
 }
