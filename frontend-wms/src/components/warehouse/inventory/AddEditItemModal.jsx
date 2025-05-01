@@ -1,6 +1,6 @@
 // Path: frontend-wms/src/components/warehouse/inventory/AddEditItemModal.jsx
 import React, { useState, useEffect, useContext } from 'react';
-import { FaTimes, FaSave, FaTrash } from 'react-icons/fa';
+import { FaTimes, FaSave, FaQrcode, FaInfoCircle } from 'react-icons/fa';
 import { AuthContext } from '../../../contexts/AuthContext';
 import axios from 'axios';
 
@@ -16,7 +16,8 @@ const AddEditItemModal = ({ item, onSave, onClose }) => {
     warehouseId: currentUser?.warehouseId || '',
     quantity: 0,
     minStockLevel: 0,
-    customFields: {}
+    customFields: {},
+    generateUnits: !item // Default to true for new items, false for editing
   });
   
   const [loading, setLoading] = useState(false);
@@ -41,7 +42,8 @@ const AddEditItemModal = ({ item, onSave, onClose }) => {
         warehouseId: item.warehouseId || currentUser?.warehouseId || '',
         quantity: item.quantity || 0,
         minStockLevel: item.minStockLevel || 0,
-        customFields: item.customFields || {}
+        customFields: item.customFields || {},
+        generateUnits: false // Default to false in edit mode
       });
       
       // If category already selected, fetch its fields
@@ -133,12 +135,14 @@ const AddEditItemModal = ({ item, onSave, onClose }) => {
   
   // Handle basic input changes
   const handleChange = (e) => {
-    const { name, value, type } = e.target;
+    const { name, value, type, checked } = e.target;
     let updatedValue = value;
     
     // Convert numeric fields to numbers
     if (type === 'number') {
       updatedValue = value === '' ? 0 : parseInt(value, 10);
+    } else if (type === 'checkbox') {
+      updatedValue = checked;
     }
     
     // If changing category, fetch its fields
@@ -170,6 +174,14 @@ const AddEditItemModal = ({ item, onSave, onClose }) => {
         [fieldName]: processedValue
       }
     });
+  };
+  
+  // Toggle unit generation flag
+  const toggleGenerateUnits = () => {
+    setFormData(prev => ({
+      ...prev,
+      generateUnits: !prev.generateUnits
+    }));
   };
   
   // Validate form before submission
@@ -219,7 +231,16 @@ const AddEditItemModal = ({ item, onSave, onClose }) => {
       return;
     }
     
-    onSave(formData);
+    // Add unit generation flags to the form data
+    const dataToSubmit = {
+      ...formData,
+      // For new item creation
+      generateUnits: !item && formData.generateUnits,
+      // For editing existing item
+      addUnits: item && formData.generateUnits && formData.quantity > item.quantity
+    };
+    
+    onSave(dataToSubmit);
   };
   
   // Render custom field based on its type
@@ -407,6 +428,34 @@ const AddEditItemModal = ({ item, onSave, onClose }) => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
               <p className="mt-1 text-xs text-gray-500">Alert will trigger when quantity falls below this level</p>
+            </div>
+            
+            {/* Unit Generation Option - NEW */}
+            <div className="col-span-2">
+              <div className="flex items-center bg-blue-50 p-3 rounded-md">
+                <input
+                  type="checkbox"
+                  id="generateUnits"
+                  checked={formData.generateUnits}
+                  onChange={toggleGenerateUnits}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="generateUnits" className="ml-2 text-sm text-gray-700 flex items-center">
+                  <FaQrcode className="mr-2 text-blue-600" />
+                  {item 
+                    ? 'Generate additional units for increased quantity' 
+                    : 'Generate individual units with unique QR codes'}
+                </label>
+                <FaInfoCircle 
+                  className="ml-2 text-blue-600 cursor-help"
+                  title="Each unit will have a unique ID and QR code for tracking"
+                />
+              </div>
+              {formData.generateUnits && formData.quantity > (item?.quantity || 0) && (
+                <p className="mt-1 text-xs text-blue-600">
+                  Will generate {item ? formData.quantity - item.quantity : formData.quantity} unique units with QR codes
+                </p>
+              )}
             </div>
             
             {/* Description */}

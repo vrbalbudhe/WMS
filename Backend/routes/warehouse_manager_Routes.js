@@ -1,4 +1,4 @@
-// Path: Backend/routes/warehouse_manager_Routes.js
+// Backend/routes/warehouse_manager_Routes.js
 const express = require("express");
 const { GetAllUsers } = require("../controllers/Warehouse Officers/GetAllUsers");
 const verifyToken = require("../middlewares/verifyTokenMW");
@@ -12,14 +12,23 @@ const {
   deleteCategory 
 } = require("../controllers/warehouse/CategoryController");
 
-// Import product controller with the correct case
+// Import product controller
 const {
   createProduct,
   getAllProducts,
   getProductById,
   updateProduct,
   deleteProduct
-} = require("../controllers/warehouse/ProductController"); // Make sure this matches the actual filename case
+} = require("../controllers/warehouse/ProductController");
+
+// Import unit controller
+const {
+  generateQRCode,
+  scanQRCode,
+  updateUnitStatus,
+  getProductUnits,
+  deleteUnit
+} = require("../controllers/warehouse/UnitController");
 
 const router = express.Router();
 
@@ -39,5 +48,12 @@ router.get("/products", verifyToken, getAllProducts);
 router.get("/products/:id", verifyToken, getProductById);
 router.put("/products/:id", verifyToken, updateProduct);
 router.delete("/products/:id", verifyToken, deleteProduct);
+
+// Unit Routes
+router.get("/units/:unitId/qr", verifyToken, generateQRCode);
+router.post("/units/scan", verifyToken, scanQRCode);
+router.put("/units/:unitId/status", verifyToken, updateUnitStatus);
+router.get("/products/:productId/units", verifyToken, getProductUnits);
+router.delete("/units/:unitId", verifyToken, deleteUnit);
 
 module.exports = router;

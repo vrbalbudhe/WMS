@@ -32,6 +32,7 @@ model User {
   status             UserStatus  @default(pending)
   products           Product[]   @relation("CreatedByUser")
   updatedProducts    Product[]   @relation("UpdatedByUser")
+  units              Unit[]      @relation("UnitCreatedByUser")
 }
 
 enum UserType {
@@ -94,7 +95,7 @@ model Product {
   warehouseId     String?   @db.ObjectId
   warehouse       Warehouse? @relation(fields: [warehouseId], references: [id])
   
-  // Audit fields - Making the user IDs optional as well
+  // Audit fields
   createdByUserId String?   @db.ObjectId
   createdByUser   User?     @relation("CreatedByUser", fields: [createdByUserId], references: [id])
   updatedByUserId String?   @db.ObjectId
@@ -103,6 +104,37 @@ model Product {
   // Timestamps
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+
+  // Units relation - a product can have many units
+  units           Unit[]
+}
+
+model Unit {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  unitId          String    @unique // Customer-facing unique ID (e.g., "PROD-1234-0001")
+  qrCodeData      String    @unique // Data encoded in QR code (can be same as unitId or different)
+  status          UnitStatus @default(available)
+  notes           String?
+  
+  // Relation to product
+  productId       String    @db.ObjectId
+  product         Product   @relation(fields: [productId], references: [id])
+  
+  // Audit fields
+  createdByUserId String?   @db.ObjectId
+  createdByUser   User?     @relation("UnitCreatedByUser", fields: [createdByUserId], references: [id])
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+enum UnitStatus {
+  available
+  reserved
+  sold
+  damaged
+  lost
 }
 
 model WarehouseFieldConfig {

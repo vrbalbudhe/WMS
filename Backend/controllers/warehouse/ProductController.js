@@ -1,8 +1,70 @@
 // Path: Backend/controllers/warehouse/ProductController.js
 const prisma = require("../../lib/prisma");
+const crypto = require("crypto");
 
 /**
- * Create a new product
+ * Generate a unique unit ID based on product and sequence
+ * @param {string} productId - The product ID
+ * @param {number} sequence - The sequence number of the unit (1-based)
+ * @returns {string} - A formatted unit ID
+ */
+const generateUnitId = (productName, productId, sequence) => {
+  // Take first 4 chars of product ID
+  const productIdShort = productId.substring(0, 4);
+  
+  // Create a slug from product name (first 3 chars)
+  const nameSlug = productName
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .toUpperCase()
+    .substring(0, 3);
+  
+  // Format as PROD-1234-001 (padding sequence with zeros)
+  return `${nameSlug}-${productIdShort}-${sequence.toString().padStart(4, '0')}`;
+};
+
+/**
+ * Generate QR code data for a unit
+ * @param {string} unitId - The unit ID
+ * @returns {string} - The QR code data
+ */
+const generateQRCodeData = (unitId) => {
+  // Generate a random string to make QR data unique
+  const randomStr = crypto.randomBytes(4).toString('hex');
+  return `${unitId}-${randomStr}`;
+};
+
+/**
+ * Create units for a product in batch
+ * @param {object} productData - Product data with ID and quantity
+ * @param {string} userId - User ID who created the units
+ * @returns {Promise<Array>} - Array of created units
+ */
+const createProductUnits = async (productData, userId) => {
+  const { id: productId, name, quantity } = productData;
+  const units = [];
+  
+  // Create specified number of units
+  for (let i = 1; i <= quantity; i++) {
+    const unitId = generateUnitId(name, productId, i);
+    const qrCodeData = generateQRCodeData(unitId);
+    
+    const unit = await prisma.unit.create({
+      data: {
+        unitId,
+        qrCodeData,
+        productId,
+        createdByUserId: userId
+      }
+    });
+    
+    units.push(unit);
+  }
+  
+  return units;
+};
+
+/**
+ * Create a new product with units
  * @route POST /api/warehouse/products
  */
 exports.createProduct = async (req, res) => {
@@ -15,7 +77,8 @@ exports.createProduct = async (req, res) => {
       warehouseId, 
       quantity, 
       minStockLevel,
-      customFields 
+      customFields,
+      generateUnits = true // Flag to control unit generation
     } = req.body;
     
     // Basic validation
@@ -62,11 +125,21 @@ exports.createProduct = async (req, res) => {
     const product = await prisma.product.create({
       data: productData
     });
+    
+    // Create units if quantity > 0 and flag is true
+    let units = [];
+    if (generateUnits && product.quantity > 0) {
+      units = await createProductUnits(product, userId);
+    }
 
     return res.status(201).json({
       success: true,
       message: "Product created successfully",
-      data: product
+      data: {
+        product,
+        unitCount: units.length,
+        units: units.slice(0, 5) // Return only first 5 units to avoid large response
+      }
     });
   } catch (error) {
     console.error("Error creating product:", error);
@@ -94,7 +167,8 @@ exports.getAllProducts = async (req, res) => {
       sortBy = 'createdAt',
       sortOrder = 'desc',
       page = 1,
-      limit = 100
+      limit = 100,
+      includeUnitCount = false // Flag to include unit count
     } = req.query;
 
     // Build the filter
@@ -165,7 +239,10 @@ exports.getAllProducts = async (req, res) => {
             name: true,
             email: true
           }
-        }
+        },
+        ...(includeUnitCount === 'true' || includeUnitCount === true
+          ? { _count: { select: { units: true } } }
+          : {})
       },
       orderBy,
       skip,
@@ -204,6 +281,7 @@ exports.getAllProducts = async (req, res) => {
 exports.getProductById = async (req, res) => {
   try {
     const { id } = req.params;
+    const { includeUnits = false } = req.query;
     
     // Validate MongoDB ObjectId format
     if (!id || !/^[0-9a-fA-F]{24}$/.test(id)) {
@@ -239,7 +317,16 @@ exports.getProductById = async (req, res) => {
             name: true,
             email: true
           }
-        }
+        },
+        ...(includeUnits === 'true' || includeUnits === true
+          ? {
+              units: {
+                take: 100, // Limit to prevent large responses
+                orderBy: { createdAt: 'desc' }
+              },
+              _count: { select: { units: true } }
+            }
+          : { _count: { select: { units: true } } })
       }
     });
     
@@ -269,115 +356,133 @@ exports.getProductById = async (req, res) => {
  * @route PUT /api/warehouse/products/:id
  */
 exports.updateProduct = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { 
-      name, 
-      description, 
-      sku, 
-      categoryId, 
-      warehouseId, 
-      quantity, 
-      minStockLevel,
-      customFields 
-    } = req.body;
-    
-    // Validate MongoDB ObjectId format
-    if (!id || !/^[0-9a-fA-F]{24}$/.test(id)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid product ID format"
-      });
-    }
-    
-    // Check if product exists
-    const productExists = await prisma.product.findUnique({
-      where: { id }
-    });
-    
-    if (!productExists) {
-      return res.status(404).json({
-        success: false,
-        message: "Product not found"
-      });
-    }
-    
-    // If category is being updated, validate it exists
-    if (categoryId && categoryId !== productExists.categoryId) {
-      const categoryExists = await prisma.category.findUnique({
-        where: { id: categoryId }
-      });
+    try {
+      const { id } = req.params;
+      const { 
+        name, 
+        description, 
+        sku, 
+        categoryId, 
+        warehouseId, 
+        quantity, 
+        minStockLevel,
+        customFields,
+        addUnits = false // Flag to add new units if quantity increases
+      } = req.body;
       
-      if (!categoryExists) {
-        return res.status(404).json({
+      console.log("Updating product:", id, "with data:", req.body);
+      
+      // Validate MongoDB ObjectId format
+      if (!id || !/^[0-9a-fA-F]{24}$/.test(id)) {
+        return res.status(400).json({
           success: false,
-          message: "Category not found"
+          message: "Invalid product ID format"
         });
       }
-    }
-    
-    // If warehouse is being updated, validate it exists
-    if (warehouseId && warehouseId !== productExists.warehouseId) {
-      const warehouseExists = await prisma.warehouse.findUnique({
-        where: { id: warehouseId }
+      
+      // Check if product exists and get current quantity
+      const productExists = await prisma.product.findUnique({
+        where: { id },
+        include: { _count: { select: { units: true } } }
       });
       
-      if (!warehouseExists) {
+      if (!productExists) {
         return res.status(404).json({
           success: false,
-          message: "Warehouse not found"
+          message: "Product not found"
         });
       }
-    }
-    
-    // Prepare update data
-    const updateData = {};
-    
-    // Only include fields that are provided in the request
-    if (name !== undefined) updateData.name = name;
-    if (description !== undefined) updateData.description = description;
-    if (sku !== undefined) updateData.sku = sku;
-    if (categoryId !== undefined) updateData.categoryId = categoryId;
-    if (warehouseId !== undefined) updateData.warehouseId = warehouseId;
-    if (quantity !== undefined) updateData.quantity = quantity;
-    if (minStockLevel !== undefined) updateData.minStockLevel = minStockLevel;
-    if (customFields !== undefined) updateData.customFields = customFields;
-    
-    // Add updated by user ID if available
-    if (req.user?.id) {
-      updateData.updatedByUserId = req.user.id;
-    }
-    
-    // Update product
-    const updatedProduct = await prisma.product.update({
-      where: { id },
-      data: updateData,
-      include: {
-        category: true,
-        warehouse: {
-          select: {
-            id: true,
-            name: true
+      
+      // Calculate how many new units to create (if quantity is increasing)
+      const currentQuantity = productExists.quantity;
+      const newQuantity = quantity !== undefined ? parseInt(quantity) : currentQuantity;
+      const unitsToAdd = addUnits && newQuantity > currentQuantity 
+        ? newQuantity - currentQuantity 
+        : 0;
+      
+      // Prepare update data
+      const updateData = {};
+      
+      // Only include fields that are provided in the request
+      if (name !== undefined) updateData.name = name;
+      if (description !== undefined) updateData.description = description;
+      if (sku !== undefined) updateData.sku = sku;
+      if (categoryId !== undefined) updateData.categoryId = categoryId === "" ? null : categoryId;
+      if (warehouseId !== undefined) updateData.warehouseId = warehouseId === "" ? null : warehouseId;
+      if (quantity !== undefined) updateData.quantity = newQuantity;
+      if (minStockLevel !== undefined) updateData.minStockLevel = minStockLevel;
+      if (customFields !== undefined) updateData.customFields = customFields;
+      
+      // Add updated by user ID if available
+      if (req.user?.id) {
+        updateData.updatedByUserId = req.user.id;
+      }
+      
+      console.log("Update data:", updateData);
+      
+      // Update product first
+      const updatedProduct = await prisma.product.update({
+        where: { id },
+        data: updateData,
+        include: {
+          category: true,
+          warehouse: {
+            select: {
+              id: true,
+              name: true
+            }
+          },
+          _count: { select: { units: true } }
+        }
+      });
+      
+      // Create new units if quantity has increased and addUnits flag is true
+      let newUnits = [];
+      if (unitsToAdd > 0) {
+        try {
+          // Determine the current unit count to start numbering from
+          const currentUnitCount = productExists._count.units;
+          
+          // Create each new unit one by one outside of a transaction
+          for (let i = 1; i <= unitsToAdd; i++) {
+            const sequence = currentUnitCount + i;
+            const unitId = generateUnitId(updatedProduct.name, id, sequence);
+            const qrCodeData = generateQRCodeData(unitId);
+            
+            const unit = await prisma.unit.create({
+              data: {
+                unitId,
+                qrCodeData,
+                productId: id,
+                createdByUserId: req.user?.id || null
+              }
+            });
+            
+            newUnits.push(unit);
           }
+        } catch (unitError) {
+          console.error("Error creating units:", unitError);
+          // We'll continue even if unit creation fails, just log the error
         }
       }
-    });
-    
-    return res.status(200).json({
-      success: true,
-      message: "Product updated successfully",
-      data: updatedProduct
-    });
-  } catch (error) {
-    console.error("Error updating product:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to update product",
-      error: error.message
-    });
-  }
-};
-
+      
+      return res.status(200).json({
+        success: true,
+        message: "Product updated successfully",
+        data: updatedProduct,
+        unitsAdded: newUnits.length,
+        newUnits: newUnits.slice(0, 5) // Return only first 5 units to avoid large response
+      });
+    } catch (error) {
+      console.error("Error updating product:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to update product",
+        error: error.message,
+        stack: error.stack
+      });
+    }
+  };
 /**
  * Delete a product
  * @route DELETE /api/warehouse/products/:id
@@ -385,6 +490,7 @@ exports.updateProduct = async (req, res) => {
 exports.deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
+    const { deleteUnits = true } = req.query; // Flag to control unit deletion
     
     // Validate MongoDB ObjectId format
     if (!id || !/^[0-9a-fA-F]{24}$/.test(id)) {
@@ -396,13 +502,27 @@ exports.deleteProduct = async (req, res) => {
     
     // Check if product exists
     const product = await prisma.product.findUnique({
-      where: { id }
+      where: { id },
+      include: { _count: { select: { units: true } } }
     });
     
     if (!product) {
       return res.status(404).json({
         success: false,
         message: "Product not found"
+      });
+    }
+    
+    // Delete associated units if flag is true
+    if (deleteUnits) {
+      await prisma.unit.deleteMany({
+        where: { productId: id }
+      });
+    } else if (product._count.units > 0) {
+      // If units exist and we're not deleting them, prevent product deletion
+      return res.status(400).json({
+        success: false,
+        message: "Cannot delete product that has units. Set deleteUnits=true to delete them as well."
       });
     }
     
@@ -413,7 +533,8 @@ exports.deleteProduct = async (req, res) => {
     
     return res.status(200).json({
       success: true,
-      message: "Product deleted successfully"
+      message: "Product deleted successfully",
+      unitsDeleted: deleteUnits ? product._count.units : 0
     });
   } catch (error) {
     console.error("Error deleting product:", error);

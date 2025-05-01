@@ -1,12 +1,20 @@
-// Path: frontend-wms/src/pages/warehouse/InventoryManagement.jsx
+// frontend-wms/src/pages/warehouse/InventoryManagement.jsx
 import React, { useState, useEffect, useContext } from 'react';
-import { FaPlus, FaFilter, FaSearch, FaExclamationTriangle, FaSyncAlt } from 'react-icons/fa';
+import { 
+  FaPlus, 
+  FaFilter, 
+  FaSearch, 
+  FaExclamationTriangle, 
+  FaSyncAlt,
+  FaQrcode
+} from 'react-icons/fa';
 import axios from 'axios';
 import { AuthContext } from '../../contexts/AuthContext';
 import InventoryTable from '../../components/warehouse/inventory/InventoryTable';
 import AddEditItemModal from '../../components/warehouse/inventory/AddEditItemModal';
 import ItemDetailsModal from '../../components/warehouse/inventory/ItemDetailsModal';
 import ScanItemModal from '../../components/warehouse/inventory/ScanItemModal';
+import ScanUnitModal from '../../components/warehouse/inventory/ScanUnitModal';
 
 const InventoryManagement = () => {
   const { currentUser } = useContext(AuthContext);
@@ -34,9 +42,11 @@ const InventoryManagement = () => {
   const [showAddEditModal, setShowAddEditModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showScanModal, setShowScanModal] = useState(false);
+  const [showScanUnitModal, setShowScanUnitModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
   const [productToDelete, setProductToDelete] = useState(null);
+  const [scannedUnit, setScannedUnit] = useState(null);
   
   // Fetch products and categories on component mount
   useEffect(() => {
@@ -54,7 +64,8 @@ const InventoryManagement = () => {
         page: currentPage,
         limit: itemsPerPage,
         sortBy: sortField,
-        sortOrder: sortDirection
+        sortOrder: sortDirection,
+        includeUnitCount: true
       });
       
       // Add filters if they exist
@@ -142,14 +153,42 @@ const InventoryManagement = () => {
   
   // Open modal for editing a product
   const handleEditProduct = (product) => {
-    setCurrentProduct(product);
-    setShowAddEditModal(true);
+    // Fetch full product details with unit count
+    fetchProductDetails(product.id, true);
+  };
+  
+  // Fetch detailed product information
+  const fetchProductDetails = async (productId, forEdit = false) => {
+    try {
+      setIsLoading(true);
+      
+      const response = await axios.get(
+        `http://localhost:8000/api/wm/products/${productId}?includeUnits=true`,
+        { withCredentials: true }
+      );
+      
+      if (response.data.success) {
+        setCurrentProduct(response.data.data);
+        
+        if (forEdit) {
+          setShowAddEditModal(true);
+        } else {
+          setShowDetailsModal(true);
+        }
+      } else {
+        setError(response.data.message || 'Failed to fetch product details');
+      }
+    } catch (err) {
+      console.error('Error fetching product details:', err);
+      setError(err.response?.data?.message || err.message || 'Failed to fetch product details');
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   // Open modal for viewing product details
   const handleViewProduct = (product) => {
-    setCurrentProduct(product);
-    setShowDetailsModal(true);
+    fetchProductDetails(product.id);
   };
   
   // Show delete confirmation
@@ -184,6 +223,12 @@ const InventoryManagement = () => {
         fetchProducts();
         // Close modal
         setShowAddEditModal(false);
+        
+        // If units were created, show a success message
+        const unitCount = response.data.data.unitCount || 0;
+        if (unitCount > 0) {
+          alert(`Product created successfully with ${unitCount} units!`);
+        }
       } else {
         alert(response.data.message || 'Failed to save product');
       }
@@ -199,7 +244,7 @@ const InventoryManagement = () => {
     
     try {
       const response = await axios.delete(
-        `http://localhost:8000/api/wm/products/${productToDelete}`,
+        `http://localhost:8000/api/wm/products/${productToDelete}?deleteUnits=true`,
         { withCredentials: true }
       );
       
@@ -209,6 +254,11 @@ const InventoryManagement = () => {
         // Close confirmation dialog
         setShowDeleteConfirm(false);
         setProductToDelete(null);
+        
+        // Show units deleted message if applicable
+        if (response.data.unitsDeleted > 0) {
+          alert(`Product and ${response.data.unitsDeleted} units were deleted successfully`);
+        }
       } else {
         alert(response.data.message || 'Failed to delete product');
       }
@@ -218,23 +268,38 @@ const InventoryManagement = () => {
     }
   };
   
-  // Handle QR scanning
+  // Handle QR scanning for product creation
   const handleScanProduct = () => {
     setShowScanModal(true);
   };
   
-  // Handle scanned item
+  // Handle unit scanning
+  const handleScanUnit = () => {
+    setShowScanUnitModal(true);
+  };
+  
+  // Handle scanned product
   const handleItemDetected = async (scanResult) => {
     try {
-      // Here you would typically lookup the product by QR code/barcode
-      alert(`Item detected: ${scanResult}`);
+      // For now, just close the scan modal
       setShowScanModal(false);
       
-      // For now, let's just close the modal
-      // In a real implementation, you'd fetch the product details and show them
+      // In a real implementation, you would look up or create a product based on the scan
+      alert(`Scanned item: ${scanResult}`);
     } catch (err) {
       console.error('Error processing scanned item:', err);
       alert('Failed to process scanned item');
+    }
+  };
+  
+  // Handle successful unit scan
+  const handleUnitScanned = (unitData) => {
+    setScannedUnit(unitData);
+    setShowScanUnitModal(false);
+    
+    // Fetch the product details to show in the detail modal
+    if (unitData && unitData.product && unitData.product.id) {
+      fetchProductDetails(unitData.product.id);
     }
   };
   
@@ -244,6 +309,13 @@ const InventoryManagement = () => {
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <h1 className="text-2xl font-bold text-gray-900">Inventory Management</h1>
         <div className="flex gap-2">
+          <button
+            onClick={handleScanUnit}
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <FaQrcode className="mr-2 -ml-1" />
+            Scan Unit QR
+          </button>
           <button
             onClick={handleScanProduct}
             className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -410,11 +482,19 @@ const InventoryManagement = () => {
         />
       )}
       
-      {/* Scan Modal */}
+      {/* Scan Product Modal */}
       {showScanModal && (
         <ScanItemModal
           onItemDetected={handleItemDetected}
           onClose={() => setShowScanModal(false)}
+        />
+      )}
+      
+      {/* Scan Unit Modal */}
+      {showScanUnitModal && (
+        <ScanUnitModal
+          onSuccessfulScan={handleUnitScanned}
+          onClose={() => setShowScanUnitModal(false)}
         />
       )}
       
@@ -426,7 +506,7 @@ const InventoryManagement = () => {
               <h2 className="text-xl font-semibold">Confirm Delete</h2>
             </div>
             <div className="p-6">
-              <p className="mb-4">Are you sure you want to delete this product? This action cannot be undone.</p>
+              <p className="mb-4">Are you sure you want to delete this product? This will also delete all associated units and QR codes.</p>
               <div className="flex justify-end space-x-3">
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
