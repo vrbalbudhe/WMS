@@ -2,7 +2,16 @@
 import axios from "axios";
 import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../contexts/AuthContext";
-import { Eye, EyeOff, AlertCircle, Loader2, LogIn, User, Building, X } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  AlertCircle,
+  Loader2,
+  LogIn,
+  User,
+  Building,
+  X,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const LoginForm = ({ setIsLogin }) => {
@@ -13,8 +22,9 @@ const LoginForm = ({ setIsLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isUserLogin, setIsUserLogin] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { refreshLoginContext, setCurrentUser, loading, setLoading } = useContext(AuthContext);
-  
+  const { refreshLoginContext, setCurrentUser, loading, setLoading } =
+    useContext(AuthContext);
+
   // New state to control whether the modal can be closed
   const [allowClose, setAllowClose] = useState(true);
 
@@ -44,46 +54,46 @@ const LoginForm = ({ setIsLogin }) => {
     setIsSubmitting(true);
     setAllowClose(false); // Prevent closing during submission
     setLoading(true);
-    
+
     try {
       // Determine which login endpoint to use based on user type
-      const endpoint = isUserLogin 
-        ? "http://localhost:8000/api/auth/login" 
-        : "http://localhost:8000/api/admin/login";
-      
+      const endpoint = isUserLogin
+        ? `${import.meta.env.VITE_BACKEND_URL}/api/auth/login`
+        : `${import.meta.env.VITE_BACKEND_URL}/api/admin/login`;
+
       const response = await axios.post(
         endpoint,
         { email, password },
         { withCredentials: true }
       );
-      
+
       if (response.data.success) {
         // Get user info from response
         const userData = response.data.user;
-        
+
         // Store the user data in context
         if (userData) {
           // Ensure userType is available for routing logic
           if (response.data.role === "ADMIN" && !userData.userType) {
             userData.userType = "ADMIN";
           }
-          
+
           setCurrentUser(userData);
         }
-        
+
         setAllowClose(true); // Only allow closing on success
-        
+
         // Close the login modal ONLY on successful login
         setIsLogin(false);
-        
+
         // Refresh login context
         await refreshLoginContext();
-        
+
         // Determine redirect path based on user role
         let redirectPath = "/";
-        
+
         const userType = userData?.userType || response.data.role;
-        
+
         if (userType === "ADMIN") {
           redirectPath = "/admin/dashboard";
         } else if (userType === "warehouse_manager") {
@@ -91,7 +101,7 @@ const LoginForm = ({ setIsLogin }) => {
         } else if (userType === "procurement_officer") {
           redirectPath = "/procurement/dashboard";
         }
-        
+
         navigate(redirectPath);
       } else {
         // Do NOT close the login modal on failure
@@ -102,7 +112,10 @@ const LoginForm = ({ setIsLogin }) => {
       // Do NOT close the login modal on failure
       setAllowClose(false);
       console.error("Login error:", err);
-      setError(err.response?.data?.message || "Login failed. Please check your credentials.");
+      setError(
+        err.response?.data?.message ||
+          "Login failed. Please check your credentials."
+      );
     } finally {
       setIsSubmitting(false);
       setLoading(false);
@@ -124,13 +137,16 @@ const LoginForm = ({ setIsLogin }) => {
 
   return (
     // Fixed the click handler to use our safe close function
-    <div className="fixed inset-0 flex items-center justify-center z-50" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 flex items-center justify-center z-50"
+      onClick={(e) => e.stopPropagation()}
+    >
       {/* Backdrop - using separate handler for backdrop */}
-      <div 
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm" 
+      <div
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm"
         onClick={safeClose}
       />
-      
+
       {/* Modal content */}
       <div
         onClick={handleModalContentClick}
@@ -140,11 +156,11 @@ const LoginForm = ({ setIsLogin }) => {
         <button
           onClick={safeClose}
           disabled={!allowClose || isSubmitting}
-          className={`absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none ${(!allowClose || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none ${!allowClose || isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
         >
           <X size={20} />
         </button>
-        
+
         {/* Login Header with Icon */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
@@ -197,7 +213,10 @@ const LoginForm = ({ setIsLogin }) => {
         {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-md flex items-center animate-fadeIn">
-            <AlertCircle size={20} className="mr-3 flex-shrink-0 text-red-500" />
+            <AlertCircle
+              size={20}
+              className="mr-3 flex-shrink-0 text-red-500"
+            />
             <span className="text-sm font-medium">{error}</span>
           </div>
         )}
@@ -266,7 +285,7 @@ const LoginForm = ({ setIsLogin }) => {
               </button>
             </div>
           </div>
-          
+
           {/* Remember me checkbox */}
           <div className="flex items-center">
             <input
@@ -276,11 +295,14 @@ const LoginForm = ({ setIsLogin }) => {
               disabled={isSubmitting}
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
-            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+            <label
+              htmlFor="remember-me"
+              className="ml-2 block text-sm text-gray-700"
+            >
               Remember me
             </label>
           </div>
-          
+
           {/* Submit button */}
           <button
             type="submit"
@@ -302,12 +324,12 @@ const LoginForm = ({ setIsLogin }) => {
             )}
           </button>
         </form>
-        
+
         {/* Footer */}
         <div className="mt-6 text-center text-sm text-gray-500">
           <p>
-            {isUserLogin 
-              ? "Contact your administrator if you're having trouble logging in." 
+            {isUserLogin
+              ? "Contact your administrator if you're having trouble logging in."
               : "Admin access is restricted to authorized personnel only."}
           </p>
         </div>

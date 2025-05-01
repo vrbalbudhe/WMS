@@ -19,7 +19,7 @@ export const AuthContextProvider = ({ children }) => {
 
       // First, check if the token is valid
       const response = await axios.get(
-        "http://localhost:8000/api/auth/isToken",
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/isToken`,
         {
           withCredentials: true,
         }
@@ -36,20 +36,20 @@ export const AuthContextProvider = ({ children }) => {
             // Fetch admin details
             console.log("Fetching admin details...");
             const adminResponse = await axios.get(
-              `http://localhost:8000/api/admin/fetch/${userInfo?.email}`
+              `${import.meta.env.VITE_BACKEND_URL}/api/admin/fetch/${userInfo?.email}`
             );
 
             console.log("Admin data response:", adminResponse.data);
 
             userData = {
               ...adminResponse?.data?.userInfo,
-              userType: "ADMIN" // Ensure userType is set for admins
+              userType: "ADMIN", // Ensure userType is set for admins
             };
           } else {
             // Fetch regular user details including warehouse info
             console.log("Fetching user details...");
             const userResponse = await axios.get(
-              `http://localhost:8000/api/user/${userInfo?.email}`,
+              `${import.meta.env.VITE_BACKEND_URL}/api/user/${userInfo?.email}`,
               { withCredentials: true }
             );
 
@@ -88,8 +88,6 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
-
-
   useEffect(() => {
     fetchUser();
   }, []);
@@ -116,13 +114,11 @@ export const AuthContextProvider = ({ children }) => {
     isWarehouseManager: currentUser?.userType === "warehouse_manager",
     warehouseId: currentUser?.warehouseId,
     warehouseName: currentUser?.warehouse?.name,
-    mustChangePassword: currentUser?.mustChangePassword || false
+    mustChangePassword: currentUser?.mustChangePassword || false,
   };
 
   return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 
