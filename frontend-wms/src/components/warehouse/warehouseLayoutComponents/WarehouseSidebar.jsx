@@ -1,3 +1,4 @@
+// Path: frontend-wms/src/components/warehouse/warehouseLayoutComponents/WarehouseSidebar.jsx
 import React, { useContext, useState } from "react";
 import {
   FaBoxOpen,
@@ -8,6 +9,8 @@ import {
   FaSignOutAlt,
   FaBars,
   FaTimes,
+  FaChevronRight,
+  FaTags,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../../contexts/AuthContext";
@@ -82,7 +85,7 @@ const WarehouseSidebar = ({ isOpen, toggleSidebar }) => {
             </li>
             <li
               className={`flex items-center space-x-3 py-3 px-4 rounded-lg cursor-pointer transition-colors duration-200 ${
-                activeItem === "dashboard"
+                activeItem === "add-product"
                   ? "bg-blue-50 text-blue-600"
                   : "text-gray-700 hover:bg-gray-100"
               }`}
@@ -91,12 +94,12 @@ const WarehouseSidebar = ({ isOpen, toggleSidebar }) => {
                 to={`/warehouse/add/${currentUser?.warehouseId}/${currentUser?.id}`}
                 className="flex items-center space-x-3 w-full"
                 onClick={() =>
-                  handleItemClick("dashboard", "/warehouse/dashboard")
+                  handleItemClick("add-product")
                 }
               >
-                <FaChartBar
+                <FaBoxOpen
                   className={
-                    activeItem === "dashboard"
+                    activeItem === "add-product"
                       ? "text-blue-600"
                       : "text-gray-500"
                   }
@@ -127,6 +130,32 @@ const WarehouseSidebar = ({ isOpen, toggleSidebar }) => {
                   }
                 />
                 <span className="font-medium">Inventory Management</span>
+              </Link>
+            </li>
+
+            {/* New Category Management Link */}
+            <li
+              className={`flex items-center space-x-3 py-3 px-4 rounded-lg cursor-pointer transition-colors duration-200 ${
+                activeItem === "categories"
+                  ? "bg-blue-50 text-blue-600"
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              <Link
+                to="/warehouse/categories"
+                className="flex items-center space-x-3 w-full"
+                onClick={() =>
+                  handleItemClick("categories", "/warehouse/categories")
+                }
+              >
+                <FaTags
+                  className={
+                    activeItem === "categories"
+                      ? "text-blue-600"
+                      : "text-gray-500"
+                  }
+                />
+                <span className="font-medium">Product Categories</span>
               </Link>
             </li>
 
@@ -178,7 +207,7 @@ const WarehouseSidebar = ({ isOpen, toggleSidebar }) => {
 
             <li
               className={`flex items-center space-x-3 py-3 px-4 rounded-lg cursor-pointer transition-colors duration-200 ${
-                activeItem === "settings"
+                activeItem === "request"
                   ? "bg-blue-50 text-blue-600"
                   : "text-gray-700 hover:bg-gray-100"
               }`}

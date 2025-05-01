@@ -1,4 +1,4 @@
-// Path: frontend-wms/src/App.jsx
+// Path: frontend-wms/src/App.jsx (Updated)
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom"; // Add missing imports
 import { PublicLayout } from "./layouts/PublicLayout";
@@ -22,7 +22,8 @@ import WarehouseDashboard from "./pages/warehouse/WarehouseDashboard";
 import InventoryManagement from "./pages/warehouse/InventoryManagement";
 import ShipmentTracking from "./pages/warehouse/ShipmentTracking";
 import StockReports from "./pages/warehouse/StockReports";
-import WarehouseRequestsDashboard from "./pages/warehouse/WarehouseRequestsDashboard"
+import WarehouseRequestsDashboard from "./pages/warehouse/WarehouseRequestsDashboard";
+import CategoryManagement from "./pages/warehouse/CategoryManagement"; // New import
 // Procurement Officer
 import { ProcurementLayout } from "./layouts/ProcurementLayout";
 import ProcurementDashboard from "./pages/procurement/ProcurementDashboard";
@@ -106,6 +107,10 @@ function App() {
         {
           path: "inventory",
           element: <InventoryManagement />,
+        },
+        {
+          path: "categories", // New route for category management
+          element: <CategoryManagement />,
         },
         {
           path: "shipments",

@@ -66,6 +66,17 @@ model Warehouse {
   updatedAt     DateTime @updatedAt
 }
 
+model Category {
+  id              String     @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  description     String?
+  fields          Json?      // Store dynamic field configurations as JSON
+  createdByUserId String?    @db.ObjectId
+  updatedByUserId String?    @db.ObjectId
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
 model WarehouseFieldConfig {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
