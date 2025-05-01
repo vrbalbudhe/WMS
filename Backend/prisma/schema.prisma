@@ -30,7 +30,10 @@ model User {
   userType           UserType
   mustChangePassword Boolean     @default(true)
   status             UserStatus  @default(pending)
+  products           Product[]   @relation("CreatedByUser")
+  updatedProducts    Product[]   @relation("UpdatedByUser")
 }
+
 enum UserType {
   procurement_officer
   warehouse_manager
@@ -42,7 +45,6 @@ enum UserStatus {
   pending
 }
 
-
 model Admin {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   email     String   @unique
@@ -50,10 +52,8 @@ model Admin {
   createdAt DateTime @default(now())
 }
 
-//for creating warehouse from admin panel
-
 model Warehouse {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
   name          String
   address       String
   city          String
@@ -62,19 +62,47 @@ model Warehouse {
   description   String?
   customFields  Json?
   users         User[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  products      Product[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model Category {
-  id              String     @id @default(auto()) @map("_id") @db.ObjectId
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
   name            String
   description     String?
-  fields          Json?      // Store dynamic field configurations as JSON
-  createdByUserId String?    @db.ObjectId
-  updatedByUserId String?    @db.ObjectId
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  fields          Json?     // Store dynamic field configurations as JSON
+  createdByUserId String?   @db.ObjectId
+  updatedByUserId String?   @db.ObjectId
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  products        Product[]
+}
+
+model Product {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  description     String?
+  sku             String?   // Stock Keeping Unit (optional)
+  quantity        Int       @default(0)
+  minStockLevel   Int       @default(0)
+  customFields    Json?     // Store dynamic field values as JSON
+  
+  // Relations - Making them optional with ? to avoid null errors
+  categoryId      String?   @db.ObjectId
+  category        Category? @relation(fields: [categoryId], references: [id])
+  warehouseId     String?   @db.ObjectId
+  warehouse       Warehouse? @relation(fields: [warehouseId], references: [id])
+  
+  // Audit fields - Making the user IDs optional as well
+  createdByUserId String?   @db.ObjectId
+  createdByUser   User?     @relation("CreatedByUser", fields: [createdByUserId], references: [id])
+  updatedByUserId String?   @db.ObjectId
+  updatedByUser   User?     @relation("UpdatedByUser", fields: [updatedByUserId], references: [id])
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }
 
 model WarehouseFieldConfig {

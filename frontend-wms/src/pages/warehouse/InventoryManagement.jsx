@@ -1,268 +1,127 @@
-import React, { useState } from 'react';
-import { 
-  FaSearch, 
-  FaFilter, 
-  FaPlus, 
-  FaFileExport, 
-  FaSort, 
-  FaSortUp, 
-  FaSortDown,
-  FaEdit,
-  FaTrash,
-  FaEye,
-  FaHistory,
-  FaBarcode
-} from 'react-icons/fa';
-import InventoryFilters from '../../components/warehouse/inventory/InventoryFilters';
+// Path: frontend-wms/src/pages/warehouse/InventoryManagement.jsx
+import React, { useState, useEffect, useContext } from 'react';
+import { FaPlus, FaFilter, FaSearch, FaExclamationTriangle, FaSyncAlt } from 'react-icons/fa';
+import axios from 'axios';
+import { AuthContext } from '../../contexts/AuthContext';
 import InventoryTable from '../../components/warehouse/inventory/InventoryTable';
-import ItemDetailsModal from '../../components/warehouse/inventory/ItemDetailsModal';
 import AddEditItemModal from '../../components/warehouse/inventory/AddEditItemModal';
+import ItemDetailsModal from '../../components/warehouse/inventory/ItemDetailsModal';
 import ScanItemModal from '../../components/warehouse/inventory/ScanItemModal';
 
 const InventoryManagement = () => {
-  // State for inventory items (in a real app, this would come from an API)
-  const [inventoryItems, setInventoryItems] = useState([
-    { 
-      id: 'ITM-2057', 
-      name: 'Office Chair - Ergonomic', 
-      category: 'Furniture',
-      location: 'Shelf 5',
-      quantity: 15,
-      minStock: 10,
-      supplier: 'Office Furnish Co.',
-      lastUpdated: '2025-04-10',
-      status: 'In Stock'
-    },
-    { 
-      id: 'ITM-1867', 
-      name: 'Printer Toner - Black', 
-      category: 'Office Supplies',
-      location: 'Shelf 2',
-      quantity: 3,
-      minStock: 15,
-      supplier: 'Tech Supplies Inc.',
-      lastUpdated: '2025-04-12',
-      status: 'Low Stock'
-    },
-    { 
-      id: 'ITM-1942', 
-      name: 'Desktop Computer - Model X', 
-      category: 'Electronics',
-      location: 'Shelf 10',
-      quantity: 8,
-      minStock: 5,
-      supplier: 'Tech Supplies Inc.',
-      lastUpdated: '2025-04-15',
-      status: 'In Stock'
-    },
-    { 
-      id: 'ITM-2103', 
-      name: 'First Aid Kit', 
-      category: 'Safety',
-      location: 'Shelf 1',
-      quantity: 1,
-      minStock: 8,
-      supplier: 'Safety First Ltd.',
-      lastUpdated: '2025-04-08',
-      status: 'Low Stock'
-    },
-    { 
-      id: 'ITM-1756', 
-      name: 'Paper - A4', 
-      category: 'Office Supplies',
-      location: 'Shelf 3',
-      quantity: 0,
-      minStock: 20,
-      supplier: 'Paper Supplies Co.',
-      lastUpdated: '2025-04-11',
-      status: 'Out of Stock'
-    },
-    { 
-      id: 'ITM-2104', 
-      name: 'Projector - HD', 
-      category: 'Electronics',
-      location: 'Shelf 7',
-      quantity: 5,
-      minStock: 3,
-      supplier: 'Tech Supplies Inc.',
-      lastUpdated: '2025-04-14',
-      status: 'In Stock'
-    },
-    { 
-      id: 'ITM-1893', 
-      name: 'Conference Table', 
-      category: 'Furniture',
-      location: 'Floor Area',
-      quantity: 2,
-      minStock: 1,
-      supplier: 'Office Furnish Co.',
-      lastUpdated: '2025-04-01',
-      status: 'In Stock'
-    },
-    { 
-      id: 'ITM-2035', 
-      name: 'Whiteboard - Large', 
-      category: 'Office Equipment',
-      location: 'Wall Storage',
-      quantity: 4,
-      minStock: 2,
-      supplier: 'Office Furnish Co.',
-      lastUpdated: '2025-04-09',
-      status: 'In Stock'
-    }
-  ]);
+  const { currentUser } = useContext(AuthContext);
   
-  // State for sorting
+  // State
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  // Filter and sort state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategory, setFilterCategory] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
   const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState('asc');
   
-  // State for search
-  const [searchTerm, setSearchTerm] = useState('');
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const itemsPerPage = 10;
   
-  // State for filters
-  const [filters, setFilters] = useState({
-    category: [],
-    status: [],
-    supplier: []
-  });
-  
-  // State for showing filter sidebar
-  const [showFilters, setShowFilters] = useState(false);
-  
-  // State for item detail modal
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [showItemDetails, setShowItemDetails] = useState(false);
-  
-  // State for adding/editing item modal
+  // Modal state
   const [showAddEditModal, setShowAddEditModal] = useState(false);
-  const [editingItem, setEditingItem] = useState(null);
-  
-  // State for scanning modal
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showScanModal, setShowScanModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [currentProduct, setCurrentProduct] = useState(null);
+  const [productToDelete, setProductToDelete] = useState(null);
   
-  // Handle item view
-  const handleViewItem = (item) => {
-    setSelectedItem(item);
-    setShowItemDetails(true);
-  };
+  // Fetch products and categories on component mount
+  useEffect(() => {
+    fetchCategories();
+    fetchProducts();
+  }, [currentPage, sortField, sortDirection]);
   
-  // Handle item edit
-  const handleEditItem = (item) => {
-    setEditingItem(item);
-    setShowAddEditModal(true);
-  };
-  
-  // Handle adding a new item
-  const handleAddNewItem = () => {
-    setEditingItem(null);
-    setShowAddEditModal(true);
-  };
-  
-  // Handle item save (add/edit)
-  const handleSaveItem = (item) => {
-    if (item.id) {
-      // Update existing item
-      setInventoryItems(prevItems => 
-        prevItems.map(i => i.id === item.id ? item : i)
-      );
-    } else {
-      // Add new item with generated ID
-      const newItem = {
-        ...item,
-        id: `ITM-${Math.floor(1000 + Math.random() * 9000)}`,
-        lastUpdated: new Date().toISOString().split('T')[0]
-      };
-      setInventoryItems(prevItems => [...prevItems, newItem]);
-    }
-    setShowAddEditModal(false);
-  };
-  
-  // Handle item delete
-  const handleDeleteItem = (id) => {
-    if (window.confirm('Are you sure you want to delete this item?')) {
-      setInventoryItems(prevItems => prevItems.filter(item => item.id !== id));
-    }
-  };
-  
-  // Handle scan item
-  const handleScanItem = () => {
-    setShowScanModal(true);
-  };
-  
-  // Handle a scanned item code
-  const handleScannedItem = (itemCode) => {
-    // Check if item exists
-    const existingItem = inventoryItems.find(item => item.id === itemCode);
-    
-    if (existingItem) {
-      // If item exists, show details or edit
-      setSelectedItem(existingItem);
-      setShowItemDetails(true);
-    } else {
-      // If item doesn't exist, create new item with the scanned code
-      setEditingItem({
-        id: itemCode,
-        name: '',
-        category: '',
-        location: '',
-        quantity: 0,
-        minStock: 0,
-        supplier: '',
-        lastUpdated: new Date().toISOString().split('T')[0],
-        status: 'In Stock'
+  // Fetch products with pagination and sorting
+  const fetchProducts = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Build query parameters
+      const params = new URLSearchParams({
+        page: currentPage,
+        limit: itemsPerPage,
+        sortBy: sortField,
+        sortOrder: sortDirection
       });
-      setShowAddEditModal(true);
+      
+      // Add filters if they exist
+      if (searchTerm) params.append('search', searchTerm);
+      if (filterCategory) params.append('categoryId', filterCategory);
+      
+      const response = await axios.get(
+        `http://localhost:8000/api/wm/products?${params.toString()}`,
+        { withCredentials: true }
+      );
+      
+      if (response.data.success) {
+        setProducts(response.data.data);
+        setTotalPages(response.data.pagination.pages);
+        setTotalItems(response.data.pagination.total);
+      } else {
+        setError(response.data.message || 'Failed to fetch products');
+      }
+    } catch (err) {
+      console.error('Error fetching products:', err);
+      setError(err.response?.data?.message || err.message || 'Failed to fetch products');
+    } finally {
+      setIsLoading(false);
     }
-    
-    // Close the scan modal
-    setShowScanModal(false);
   };
   
-  // Get all unique categories, statuses, and suppliers for filters
-  const categories = [...new Set(inventoryItems.map(item => item.category))];
-  const statuses = [...new Set(inventoryItems.map(item => item.status))];
-  const suppliers = [...new Set(inventoryItems.map(item => item.supplier))];
-  
-  // Filter items based on search term and filters
-  const filteredItems = inventoryItems.filter(item => {
-    // Filter by search term
-    const matchesSearch = 
-      searchTerm === '' || 
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      item.id.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    // Filter by category
-    const matchesCategory = 
-      filters.category.length === 0 || 
-      filters.category.includes(item.category);
-    
-    // Filter by status
-    const matchesStatus = 
-      filters.status.length === 0 || 
-      filters.status.includes(item.status);
-    
-    // Filter by supplier
-    const matchesSupplier = 
-      filters.supplier.length === 0 || 
-      filters.supplier.includes(item.supplier);
-    
-    return matchesSearch && matchesCategory && matchesStatus && matchesSupplier;
-  });
-  
-  // Sort filtered items
-  const sortedItems = [...filteredItems].sort((a, b) => {
-    if (a[sortField] < b[sortField]) {
-      return sortDirection === 'asc' ? -1 : 1;
+  // Fetch categories for filtering
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(
+        'http://localhost:8000/api/wm/categories',
+        { withCredentials: true }
+      );
+      
+      if (response.data.success) {
+        setCategories(response.data.data);
+      }
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+      // Don't set error state here as it's not critical
     }
-    if (a[sortField] > b[sortField]) {
-      return sortDirection === 'asc' ? 1 : -1;
-    }
-    return 0;
-  });
+  };
+  
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+  
+  // Handle category filter change
+  const handleCategoryFilterChange = (e) => {
+    setFilterCategory(e.target.value);
+  };
+  
+  // Handle status filter change
+  const handleStatusFilterChange = (e) => {
+    setFilterStatus(e.target.value);
+  };
+  
+  // Apply filters
+  const applyFilters = () => {
+    setCurrentPage(1); // Reset to first page when filters change
+    fetchProducts();
+  };
   
   // Handle sort
   const handleSort = (field) => {
-    if (sortField === field) {
+    if (field === sortField) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
       setSortField(field);
@@ -270,186 +129,322 @@ const InventoryManagement = () => {
     }
   };
   
-  // Handle export
-  const handleExport = () => {
-    // This would connect to a real export function in a production app
-    alert('Exporting inventory data...');
+  // Pagination handlers
+  const goToPage = (page) => {
+    setCurrentPage(page);
+  };
+  
+  // Open modal for creating a new product
+  const handleAddProduct = () => {
+    setCurrentProduct(null);
+    setShowAddEditModal(true);
+  };
+  
+  // Open modal for editing a product
+  const handleEditProduct = (product) => {
+    setCurrentProduct(product);
+    setShowAddEditModal(true);
+  };
+  
+  // Open modal for viewing product details
+  const handleViewProduct = (product) => {
+    setCurrentProduct(product);
+    setShowDetailsModal(true);
+  };
+  
+  // Show delete confirmation
+  const handleDeleteClick = (productId) => {
+    setProductToDelete(productId);
+    setShowDeleteConfirm(true);
+  };
+  
+  // Handle product create or update
+  const handleSaveProduct = async (productData) => {
+    try {
+      let response;
+      
+      if (currentProduct) {
+        // Update existing product
+        response = await axios.put(
+          `http://localhost:8000/api/wm/products/${currentProduct.id}`,
+          productData,
+          { withCredentials: true }
+        );
+      } else {
+        // Create new product
+        response = await axios.post(
+          'http://localhost:8000/api/wm/products',
+          productData,
+          { withCredentials: true }
+        );
+      }
+      
+      if (response.data.success) {
+        // Refresh products list
+        fetchProducts();
+        // Close modal
+        setShowAddEditModal(false);
+      } else {
+        alert(response.data.message || 'Failed to save product');
+      }
+    } catch (err) {
+      console.error('Error saving product:', err);
+      alert(err.response?.data?.message || err.message || 'Failed to save product');
+    }
+  };
+  
+  // Handle product delete
+  const handleDeleteProduct = async () => {
+    if (!productToDelete) return;
+    
+    try {
+      const response = await axios.delete(
+        `http://localhost:8000/api/wm/products/${productToDelete}`,
+        { withCredentials: true }
+      );
+      
+      if (response.data.success) {
+        // Refresh products list
+        fetchProducts();
+        // Close confirmation dialog
+        setShowDeleteConfirm(false);
+        setProductToDelete(null);
+      } else {
+        alert(response.data.message || 'Failed to delete product');
+      }
+    } catch (err) {
+      console.error('Error deleting product:', err);
+      alert(err.response?.data?.message || err.message || 'Failed to delete product');
+    }
+  };
+  
+  // Handle QR scanning
+  const handleScanProduct = () => {
+    setShowScanModal(true);
+  };
+  
+  // Handle scanned item
+  const handleItemDetected = async (scanResult) => {
+    try {
+      // Here you would typically lookup the product by QR code/barcode
+      alert(`Item detected: ${scanResult}`);
+      setShowScanModal(false);
+      
+      // For now, let's just close the modal
+      // In a real implementation, you'd fetch the product details and show them
+    } catch (err) {
+      console.error('Error processing scanned item:', err);
+      alert('Failed to process scanned item');
+    }
   };
   
   return (
-    <div style={{ width: '100%', overflowX: 'hidden' }}>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center flex-wrap gap-4">
-          <h1 className="text-2xl font-bold text-gray-800">Inventory Management</h1>
-          <div className="flex space-x-2">
-            <button 
-              onClick={handleScanItem}
-              className="flex items-center text-white bg-purple-600 hover:bg-purple-700 py-2 px-4 rounded-lg"
-            >
-              <FaBarcode className="mr-2" />
-              Scan Item
-            </button>
-            <button 
-              onClick={handleAddNewItem}
-              className="flex items-center text-white bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-lg"
-            >
-              <FaPlus className="mr-2" />
-              Add Item
-            </button>
-            <button 
-              onClick={handleExport}
-              className="flex items-center text-white bg-gray-600 hover:bg-gray-700 py-2 px-4 rounded-lg"
-            >
-              <FaFileExport className="mr-2" />
-              Export
-            </button>
-          </div>
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+        <h1 className="text-2xl font-bold text-gray-900">Inventory Management</h1>
+        <div className="flex gap-2">
+          <button
+            onClick={handleScanProduct}
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <FaSyncAlt className="mr-2 -ml-1" />
+            Scan Item
+          </button>
+          <button
+            onClick={handleAddProduct}
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <FaPlus className="mr-2 -ml-1" />
+            Add New Item
+          </button>
         </div>
-        
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Filter sidebar for larger screens */}
-          <div className={`hidden md:block w-64 flex-shrink-0 ${showFilters ? 'block' : 'hidden'}`}>
-            <InventoryFilters 
-              filters={filters}
-              setFilters={setFilters}
-              categories={categories}
-              statuses={statuses}
-              suppliers={suppliers}
-            />
-          </div>
-          
-          <div className="flex-grow" style={{ minWidth: 0, maxWidth: '100%' }}>
-            {/* Search and filter bar */}
-            <div className="bg-white p-4 rounded-lg shadow mb-6">
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="relative flex-grow">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaSearch className="text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Search by name or ID..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-                
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="md:hidden flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg leading-5 bg-white text-gray-700 hover:bg-gray-50"
-                >
-                  <FaFilter className="mr-2" />
-                  Filters
-                </button>
+      </div>
+      
+      {/* Filters and Search */}
+      <div className="bg-white p-4 rounded-lg shadow space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex-1">
+            <div className="relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaSearch className="text-gray-400" />
               </div>
-              
-              {/* Filter tags */}
-              {(filters.category.length > 0 || filters.status.length > 0 || filters.supplier.length > 0) && (
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {filters.category.map(cat => (
-                    <span key={`cat-${cat}`} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full flex items-center">
-                      {cat}
-                      <button 
-                        className="ml-1 focus:outline-none" 
-                        onClick={() => setFilters({...filters, category: filters.category.filter(c => c !== cat)})}
-                      >
-                        &times;
-                      </button>
-                    </span>
-                  ))}
-                  {filters.status.map(status => (
-                    <span key={`status-${status}`} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full flex items-center">
-                      {status}
-                      <button 
-                        className="ml-1 focus:outline-none" 
-                        onClick={() => setFilters({...filters, status: filters.status.filter(s => s !== status)})}
-                      >
-                        &times;
-                      </button>
-                    </span>
-                  ))}
-                  {filters.supplier.map(supplier => (
-                    <span key={`supplier-${supplier}`} className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full flex items-center">
-                      {supplier}
-                      <button 
-                        className="ml-1 focus:outline-none" 
-                        onClick={() => setFilters({...filters, supplier: filters.supplier.filter(s => s !== supplier)})}
-                      >
-                        &times;
-                      </button>
-                    </span>
-                  ))}
-                  <button 
-                    className="text-gray-500 text-xs underline"
-                    onClick={() => setFilters({category: [], status: [], supplier: []})}
-                  >
-                    Clear all
-                  </button>
-                </div>
-              )}
-            </div>
-            
-            {/* Mobile filter panel */}
-            {showFilters && (
-              <div className="md:hidden mb-6">
-                <InventoryFilters 
-                  filters={filters}
-                  setFilters={setFilters}
-                  categories={categories}
-                  statuses={statuses}
-                  suppliers={suppliers}
-                  onClose={() => setShowFilters(false)}
-                />
-              </div>
-            )}
-            
-            {/* Inventory table with limited width to prevent overflow */}
-            <div style={{ width: '100%', overflowX: 'auto', display: 'block' }}>
-              <InventoryTable 
-                items={sortedItems} 
-                sortField={sortField}
-                sortDirection={sortDirection}
-                onSort={handleSort}
-                onView={handleViewItem}
-                onEdit={handleEditItem}
-                onDelete={handleDeleteItem}
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Search products..."
               />
             </div>
           </div>
+          
+          <div className="flex flex-col md:flex-row gap-2">
+            <div className="w-full md:w-48">
+              <div className="relative rounded-md shadow-sm">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaFilter className="text-gray-400" />
+                </div>
+                <select
+                  value={filterCategory}
+                  onChange={handleCategoryFilterChange}
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">All Categories</option>
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            
+            <button
+              onClick={applyFilters}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Apply Filters
+            </button>
+          </div>
         </div>
-        
-        {/* Item details modal */}
-        {showItemDetails && selectedItem && (
-          <ItemDetailsModal 
-            item={selectedItem} 
-            onClose={() => setShowItemDetails(false)}
-            onEdit={() => {
-              setShowItemDetails(false);
-              handleEditItem(selectedItem);
-            }}
-          />
-        )}
-        
-        {/* Add/Edit item modal */}
-        {showAddEditModal && (
-          <AddEditItemModal 
-            item={editingItem} 
-            categories={categories}
-            suppliers={suppliers}
-            onSave={handleSaveItem}
-            onClose={() => setShowAddEditModal(false)}
-          />
-        )}
-        
-        {/* Scan item modal */}
-        {showScanModal && (
-          <ScanItemModal 
-            onClose={() => setShowScanModal(false)}
-            onItemDetected={handleScannedItem}
-          />
-        )}
       </div>
+      
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md">
+          <div className="flex items-center">
+            <FaExclamationTriangle className="mr-2" />
+            <p>{error}</p>
+          </div>
+        </div>
+      )}
+      
+      {/* Products Table */}
+      <InventoryTable
+        products={products}
+        sortField={sortField}
+        sortDirection={sortDirection}
+        onSort={handleSort}
+        onView={handleViewProduct}
+        onEdit={handleEditProduct}
+        onDelete={handleDeleteClick}
+        loading={isLoading}
+      />
+      
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow">
+          <div className="text-sm text-gray-500">
+            Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} items
+          </div>
+          <div className="flex space-x-1">
+            <button
+              onClick={() => goToPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+              className={`px-3 py-1 rounded ${
+                currentPage === 1
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+              }`}
+            >
+              Previous
+            </button>
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              // Show pages around current page
+              const pageNum = currentPage <= 3
+                ? i + 1
+                : currentPage >= totalPages - 2
+                  ? totalPages - 4 + i
+                  : currentPage - 2 + i;
+              
+              if (pageNum <= 0 || pageNum > totalPages) return null;
+              
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => goToPage(pageNum)}
+                  className={`px-3 py-1 rounded ${
+                    currentPage === pageNum
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
+            <button
+              onClick={() => goToPage(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages}
+              className={`px-3 py-1 rounded ${
+                currentPage === totalPages
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+              }`}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+      
+      {/* Add/Edit Product Modal */}
+      {showAddEditModal && (
+        <AddEditItemModal
+          item={currentProduct}
+          onSave={handleSaveProduct}
+          onClose={() => setShowAddEditModal(false)}
+        />
+      )}
+      
+      {/* Product Details Modal */}
+      {showDetailsModal && (
+        <ItemDetailsModal
+          product={currentProduct}
+          onEdit={() => {
+            setShowDetailsModal(false);
+            setShowAddEditModal(true);
+          }}
+          onClose={() => setShowDetailsModal(false)}
+        />
+      )}
+      
+      {/* Scan Modal */}
+      {showScanModal && (
+        <ScanItemModal
+          onItemDetected={handleItemDetected}
+          onClose={() => setShowScanModal(false)}
+        />
+      )}
+      
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
+            <div className="bg-red-600 text-white px-6 py-4">
+              <h2 className="text-xl font-semibold">Confirm Delete</h2>
+            </div>
+            <div className="p-6">
+              <p className="mb-4">Are you sure you want to delete this product? This action cannot be undone.</p>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteProduct}
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,66 +1,299 @@
-import React, { useState, useEffect } from 'react';
+// Path: frontend-wms/src/components/warehouse/inventory/AddEditItemModal.jsx
+import React, { useState, useEffect, useContext } from 'react';
 import { FaTimes, FaSave, FaTrash } from 'react-icons/fa';
+import { AuthContext } from '../../../contexts/AuthContext';
+import axios from 'axios';
 
-const AddEditItemModal = ({ item, categories, suppliers, onSave, onClose }) => {
-  // Initialize form state
+const AddEditItemModal = ({ item, onSave, onClose }) => {
+  const { currentUser } = useContext(AuthContext);
+  
+  // States
   const [formData, setFormData] = useState({
-    id: '',
     name: '',
-    category: '',
-    location: '',
+    description: '',
+    sku: '',
+    categoryId: '',
+    warehouseId: currentUser?.warehouseId || '',
     quantity: 0,
-    minStock: 0,
-    supplier: '',
-    status: 'In Stock',
-    lastUpdated: new Date().toISOString().split('T')[0]
+    minStockLevel: 0,
+    customFields: {}
   });
   
-  // When item prop changes, update form state
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [categoryFields, setCategoryFields] = useState([]);
+  
+  // Fetch categories on component mount
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+  
+  // When item prop changes (for edit mode)
   useEffect(() => {
     if (item) {
-      setFormData(item);
+      setFormData({
+        name: item.name || '',
+        description: item.description || '',
+        sku: item.sku || '',
+        categoryId: item.categoryId || '',
+        warehouseId: item.warehouseId || currentUser?.warehouseId || '',
+        quantity: item.quantity || 0,
+        minStockLevel: item.minStockLevel || 0,
+        customFields: item.customFields || {}
+      });
+      
+      // If category already selected, fetch its fields
+      if (item.categoryId) {
+        fetchCategoryFields(item.categoryId);
+      }
     }
-  }, [item]);
+  }, [item, currentUser]);
   
-  // Handle input changes
+  // Fetch all categories
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        'http://localhost:8000/api/wm/categories', 
+        { withCredentials: true }
+      );
+      
+      if (response.data.success) {
+        setCategories(response.data.data);
+      } else {
+        setError('Failed to load categories');
+      }
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+      setError('An error occurred while loading categories');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Fetch fields for selected category
+  const fetchCategoryFields = async (categoryId) => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `http://localhost:8000/api/wm/categories/${categoryId}`,
+        { withCredentials: true }
+      );
+      
+      if (response.data.success) {
+        const category = response.data.data;
+        setSelectedCategory(category);
+        
+        // Transform fields object to array for easier rendering
+        if (category.fields) {
+          const fieldsArray = Object.entries(category.fields).map(([name, config]) => ({
+            name,
+            ...config
+          }));
+          setCategoryFields(fieldsArray);
+          
+          // Initialize custom fields if in create mode
+          if (!item) {
+            const initialCustomFields = {};
+            fieldsArray.forEach(field => {
+              // Set default values based on field type
+              if (field.type === 'number') {
+                initialCustomFields[field.name] = 0;
+              } else if (field.type === 'checkbox') {
+                initialCustomFields[field.name] = false;
+              } else if (field.type === 'dropdown' && field.options && field.options.length > 0) {
+                initialCustomFields[field.name] = field.options[0];
+              } else {
+                initialCustomFields[field.name] = '';
+              }
+            });
+            
+            setFormData(prev => ({
+              ...prev,
+              customFields: initialCustomFields
+            }));
+          }
+        } else {
+          setCategoryFields([]);
+        }
+      } else {
+        setError('Failed to load category details');
+        setCategoryFields([]);
+      }
+    } catch (err) {
+      console.error('Error fetching category details:', err);
+      setError('An error occurred while loading category details');
+      setCategoryFields([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Handle basic input changes
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
     let updatedValue = value;
     
     // Convert numeric fields to numbers
-    if (name === 'quantity' || name === 'minStock') {
+    if (type === 'number') {
       updatedValue = value === '' ? 0 : parseInt(value, 10);
     }
     
-    // Update status based on quantity
-    let updatedFormData = {
-      ...formData,
-      [name]: updatedValue
-    };
-    
-    if (name === 'quantity') {
-      if (updatedValue === 0) {
-        updatedFormData.status = 'Out of Stock';
-      } else if (updatedValue < updatedFormData.minStock) {
-        updatedFormData.status = 'Low Stock';
-      } else {
-        updatedFormData.status = 'In Stock';
-      }
+    // If changing category, fetch its fields
+    if (name === 'categoryId' && value) {
+      fetchCategoryFields(value);
     }
     
-    setFormData(updatedFormData);
+    setFormData({
+      ...formData,
+      [name]: updatedValue
+    });
+  };
+  
+  // Handle custom field changes
+  const handleCustomFieldChange = (fieldName, value, type) => {
+    let processedValue = value;
+    
+    // Convert value based on field type
+    if (type === 'number') {
+      processedValue = value === '' ? 0 : parseInt(value, 10);
+    } else if (type === 'checkbox') {
+      processedValue = value;
+    }
+    
+    setFormData({
+      ...formData,
+      customFields: {
+        ...formData.customFields,
+        [fieldName]: processedValue
+      }
+    });
+  };
+  
+  // Validate form before submission
+  const validateForm = () => {
+    // Basic validation
+    if (!formData.name.trim()) {
+      setError('Product name is required');
+      return false;
+    }
+    
+    if (!formData.categoryId) {
+      setError('Please select a category');
+      return false;
+    }
+    
+    if (!formData.warehouseId) {
+      setError('Warehouse is required');
+      return false;
+    }
+    
+    // Validate required custom fields
+    const missingRequiredFields = categoryFields
+      .filter(field => field.isRequired)
+      .filter(field => {
+        const value = formData.customFields[field.name];
+        if (value === undefined || value === null || value === '') {
+          return true;
+        }
+        return false;
+      })
+      .map(field => field.name);
+    
+    if (missingRequiredFields.length > 0) {
+      setError(`Please fill in the following required fields: ${missingRequiredFields.join(', ')}`);
+      return false;
+    }
+    
+    return true;
   };
   
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
+    setError(null);
+    
+    if (!validateForm()) {
+      return;
+    }
+    
     onSave(formData);
   };
   
-  // Handle "Enter" key to submit form
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      handleSubmit(e);
+  // Render custom field based on its type
+  const renderCustomField = (field) => {
+    const value = formData.customFields[field.name] !== undefined 
+      ? formData.customFields[field.name] 
+      : '';
+    
+    switch (field.type) {
+      case 'text':
+        return (
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => handleCustomFieldChange(field.name, e.target.value, field.type)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          />
+        );
+      
+      case 'number':
+        return (
+          <input
+            type="number"
+            value={value}
+            onChange={(e) => handleCustomFieldChange(field.name, e.target.value, field.type)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          />
+        );
+      
+      case 'date':
+        return (
+          <input
+            type="date"
+            value={value}
+            onChange={(e) => handleCustomFieldChange(field.name, e.target.value, field.type)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          />
+        );
+      
+      case 'checkbox':
+        return (
+          <input
+            type="checkbox"
+            checked={!!value}
+            onChange={(e) => handleCustomFieldChange(field.name, e.target.checked, field.type)}
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          />
+        );
+      
+      case 'dropdown':
+        return (
+          <select
+            value={value}
+            onChange={(e) => handleCustomFieldChange(field.name, e.target.value, field.type)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Select an option</option>
+            {field.options && field.options.map((option, index) => (
+              <option key={index} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        );
+      
+      default:
+        return (
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => handleCustomFieldChange(field.name, e.target.value, 'text')}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          />
+        );
     }
   };
   
@@ -78,23 +311,19 @@ const AddEditItemModal = ({ item, categories, suppliers, onSave, onClose }) => {
         </div>
         
         {/* Form */}
-        <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="flex-grow overflow-y-auto p-6">
+        <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto p-6">
+          {/* Error message */}
+          {error && (
+            <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded">
+              <p>{error}</p>
+            </div>
+          )}
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Item ID - shown only for edit mode */}
-            {item && (
-              <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Item ID
-                </label>
-                <input
-                  type="text"
-                  value={formData.id}
-                  disabled
-                  className="bg-gray-100 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-                <p className="mt-1 text-xs text-gray-500">Item ID cannot be changed</p>
-              </div>
-            )}
+            {/* Basic Information Section */}
+            <div className="col-span-2">
+              <h3 className="text-lg font-medium text-gray-900 mb-3">Basic Information</h3>
+            </div>
             
             {/* Name */}
             <div className="col-span-2">
@@ -112,67 +341,43 @@ const AddEditItemModal = ({ item, categories, suppliers, onSave, onClose }) => {
               />
             </div>
             
+            {/* SKU */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                SKU
+              </label>
+              <input
+                type="text"
+                name="sku"
+                value={formData.sku}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder="e.g., ITM-12345"
+              />
+            </div>
+            
             {/* Category */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Category *
               </label>
               <select
-                name="category"
-                value={formData.category}
+                name="categoryId"
+                value={formData.categoryId}
                 onChange={handleChange}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">Select a category</option>
                 {categories.map(category => (
-                  <option key={category} value={category}>
-                    {category}
+                  <option key={category.id} value={category.id}>
+                    {category.name}
                   </option>
                 ))}
-                <option value="Other">Other</option>
               </select>
             </div>
             
-            {/* Supplier */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Supplier *
-              </label>
-              <select
-                name="supplier"
-                value={formData.supplier}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Select a supplier</option>
-                {suppliers.map(supplier => (
-                  <option key={supplier} value={supplier}>
-                    {supplier}
-                  </option>
-                ))}
-                <option value="Other">Other</option>
-              </select>
-            </div>
-            
-            {/* Location */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Location *
-              </label>
-              <input
-                type="text"
-                name="location"
-                value={formData.location}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Warehouse A, Shelf 5"
-              />
-            </div>
-            
-            {/* Current Quantity */}
+            {/* Quantity */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Current Quantity *
@@ -188,36 +393,65 @@ const AddEditItemModal = ({ item, categories, suppliers, onSave, onClose }) => {
               />
             </div>
             
-            {/* Min Stock */}
+            {/* Min Stock Level */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Minimum Stock Level *
+                Minimum Stock Level
               </label>
               <input
                 type="number"
-                name="minStock"
+                name="minStockLevel"
                 min="0"
-                value={formData.minStock}
+                value={formData.minStockLevel}
                 onChange={handleChange}
-                required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
               <p className="mt-1 text-xs text-gray-500">Alert will trigger when quantity falls below this level</p>
             </div>
             
-            {/* Status (calculated automatically) */}
-            <div>
+            {/* Description */}
+            <div className="col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Status
+                Description
               </label>
-              <input
-                type="text"
-                value={formData.status}
-                disabled
-                className="bg-gray-100 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-              />
-              <p className="mt-1 text-xs text-gray-500">Status is determined automatically based on quantity</p>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                rows="3"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter product description"
+              ></textarea>
             </div>
+            
+            {/* Custom Fields Section */}
+            {categoryFields.length > 0 && (
+              <>
+                <div className="col-span-2 border-t pt-4 mt-2">
+                  <h3 className="text-lg font-medium text-gray-900 mb-3">
+                    {selectedCategory?.name} Fields
+                  </h3>
+                </div>
+                
+                {categoryFields.map((field) => (
+                  <div key={field.name} className={field.type === 'checkbox' ? 'flex items-center' : ''}>
+                    <label className={`block text-sm font-medium text-gray-700 mb-1 ${field.type === 'checkbox' ? 'order-2 ml-2' : ''}`}>
+                      {field.name} {field.isRequired && <span className="text-red-500">*</span>}
+                    </label>
+                    <div className={field.type === 'checkbox' ? 'order-1' : 'w-full'}>
+                      {renderCustomField(field)}
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+            
+            {/* Loading spinner for category fields */}
+            {loading && (
+              <div className="col-span-2 flex justify-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              </div>
+            )}
           </div>
         </form>
         
