@@ -5,7 +5,7 @@ const app = express();
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: process.env.VITE_BACKEND_URL || "http://localhost:5173",
   credentials: true,
 };
 // Setup middleware first
